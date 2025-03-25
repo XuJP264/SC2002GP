@@ -17,7 +17,7 @@ public class UserCard {
     public int getAge() {
         return age;
     }
-    public void getNRIC() {
+    public String getNRIC() {
         return NRIC;
     }
     public String getMarital_status() {
