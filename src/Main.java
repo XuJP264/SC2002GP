@@ -1,27 +1,43 @@
 import java.io.IOException;
 import java.util.Scanner;
 public class Main {
-    public static void main(String[] args) {
-        //the login page, choose 1 to initialize the database or 2 to login
-        System.out.println("Welcome to the login page!");
-        System.out.println("Please choose an option:");
-        System.out.println("1. Initialize the database,if the database has been initialized, please choose another option");
-        System.out.println("2. Login");
-        System.out.println("3. Exit");
-        int option = Integer.parseInt(System.console().readLine());
-        switch(option) {
-            case 1: //initialize the database
-                System.out.println("Initializing the database...");
-                //code to initialize the database
-                DatabaseInitialization.initialize();
-                System.out.println("Database initialized successfully!");
-                break;
-            case 2: //login, user need to use their SingPass account and password to login
-                System.out.println("Please enter your SingPass:");
-                String singpass = System.console().readLine();
-                System.out.println("Please enter your password:");
-                String password = System.console().readLine();
-                //code to check if the user's password is correct
-
+    public void login() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Please enter your SingPass username:");
+        String username = scanner.nextLine();
     }
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int choice = 0;
+
+        while (true) {
+            try {
+                System.out.println("Welcome to the login page!");
+                System.out.println("1. Login");
+                System.out.println("2. Exit");
+                System.out.print("Please enter your choice (1 or 2): ");
+
+                choice = scanner.nextInt(); // 获取用户输入
+
+                if (choice == 1 || choice == 2) {
+                    break; // 输入合法，跳出循环
+                } else {
+                    System.out.println("Invalid choice. Please enter 1 or 2.");
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a number (1 or 2).");
+                scanner.nextLine(); // 清空输入缓冲区，防止无限循环
+            }
+        }
+        if (choice == 1) {
+            Initialization init=new Initialization();
+            init.initialize();
+            this.login();
+        }
+        else{
+            System.out.println("Thank you for using our service!");
+            System.exit(0);
+        }
+    }
+
 }

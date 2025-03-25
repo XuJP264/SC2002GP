@@ -1,4 +1,6 @@
+import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Manager extends UserCard {
     private String identity;
@@ -14,11 +16,16 @@ public class Manager extends UserCard {
 }
 
 public class ManagerList {
-    private ArrayList<Manager> managers;
+    private HashMap<String, Manager> managers;
     public ManagerList() {
-        managers = new ArrayList<>();
+        managers = new HashMap<>();
     }
-    public ArrayList<Manager> getManagers() {
-        return managers;
+    //  via NRIC get Manager
+    public Manager getManager(String NRIC) {
+        return managers.get(NRIC);
+    }
+    // get all managers
+    public List<Manager> getAllManagers() {
+        return new ArrayList<>(managers.values());
     }
 }
