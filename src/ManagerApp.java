@@ -29,46 +29,46 @@ public class ManagerApp {
 
                 switch (choice) {
                     case 1:
-                        this.createNewBTOProject();
+                        createNewBTOProject();
                         break;
                     case 2:
-                        this.editBTOProject();
+                        editBTOProject();
                         break;
                     case 3:
-                        this.deleteBTOProject();
+                        deleteBTOProject();
                         break;
                     case 4:
-                        this.toggleProjectVisibility();
+                        toggleProjectVisibility();
                         break;
                     case 5:
-                        this.viewAllProjects();
+                        viewAllProjects();
                         break;
                     case 6:
-                        this.viewMyProjects();
+                        viewMyProjects();
                         break;
                     case 7:
-                        this.viewPendingOfficerRegistrations();
+                        viewPendingOfficerRegistrations();
                         break;
                     case 8:
-                        this.processOfficerRegistration();
+                        processOfficerRegistration();
                         break;
                     case 9:
-                        this.processBTOApplication();
+                        processBTOApplication();
                         break;
                     case 10:
-                        this.processWithdrawalRequest();
+                        processWithdrawalRequest();
                         break;
                     case 11:
-                        this.generateApplicantsReport();
+                        generateApplicantsReport();
                         break;
                     case 12:
-                        this.viewAllEnquiries();
+                        viewAllEnquiries();
                         break;
                     case 13:
-                        this.viewAndReplyEnquiries();
+                        viewAndReplyEnquiries();
                         break;
                     case 0:
-                        this.System.out.println("Exiting Manager App. Goodbye!");
+                        System.out.println("Exiting Manager App. Goodbye!");
                         break;
                     default:
                         System.out.println("Invalid choice. Please enter a number between 0 and 13.");
@@ -81,5 +81,58 @@ public class ManagerApp {
         } while (choice != 0);
 
         scanner.close();
+    }
+
+    // You'll need to implement all these methods as static methods
+    private static void createNewBTOProject() {
+        // Implementation here
+    }
+
+    private static void editBTOProject() {
+        // Implementation here
+    }
+
+    private static void deleteBTOProject() {
+        // Implementation here
+    }
+
+    private static void toggleProjectVisibility() {
+        // Implementation here
+    }
+
+    private static void viewAllProjects() {
+        // Implementation here
+    }
+
+    private static void viewMyProjects() {
+        // Implementation here
+    }
+
+    private static void viewPendingOfficerRegistrations() {
+        // Implementation here
+    }
+
+    private static void processOfficerRegistration() {
+        // Implementation here
+    }
+
+    private static void processBTOApplication() {
+        // Implementation here
+    }
+
+    private static void processWithdrawalRequest() {
+        // Implementation here
+    }
+
+    private static void generateApplicantsReport() {
+        // Implementation here
+    }
+
+    private static void viewAllEnquiries() {
+        // Implementation here
+    }
+
+    private static void viewAndReplyEnquiries() {
+        // Implementation here
     }
 }
