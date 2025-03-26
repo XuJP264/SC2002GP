@@ -25,7 +25,7 @@ public class UserCard {
         return NRIC;
     }
 
-    public String getMarital_status() {  // 改为非静态方法
+    public String getMaritalStatus() {  // 改为非静态方法
         return marital_status;
     }
 

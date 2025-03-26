@@ -21,11 +21,10 @@ public class Initialization {
 
     public void initialize() {
         System.out.println("Initializing...");
-        Initialization init = new Initialization();
-        init.applicantInitialize();
-        init.managerInitialize();
-        init.officerInitialize();
-        init.projectInitialize();
+        this.applicantInitialize();
+        this.managerInitialize();
+        this.officerInitialize();
+        this.projectInitialize();
         System.out.println("Initialization complete.");
     }
 
@@ -47,7 +46,6 @@ public class Initialization {
 
     private void applicantInitialize() {
         String filePath = "data/ApplicantList.csv";
-
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             boolean isHeader = true;
@@ -57,8 +55,7 @@ public class Initialization {
                     isHeader = false;
                     continue;
                 }
-
-                String[] data = line.split("\t");
+                String[] data = line.split(",");
                 if (data.length >= 5) {
                     String name = data[0].trim();
                     String nric = data[1].trim();
@@ -92,7 +89,7 @@ public class Initialization {
                     continue;
                 }
 
-                String[] data = line.split("\t");
+                String[] data = line.split(",");
                 if (data.length >= 5) {
                     String name = data[0].trim();
                     String nric = data[1].trim();
@@ -126,7 +123,7 @@ public class Initialization {
                     continue;
                 }
 
-                String[] data = line.split("\t");
+                String[] data = line.split(",");
                 if (data.length >= 5) {
                     String name = data[0].trim();
                     String nric = data[1].trim();
@@ -159,7 +156,7 @@ public class Initialization {
                     isHeader = false;
                     continue;
                 }
-                String[] data = line.split("\t");
+                String[] data = line.split(",");
                 if (data.length >= 12) {
                     String projectName = data[0].trim();
                     String neighborhood = data[1].trim();
