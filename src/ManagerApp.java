@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class ManagerApp {
-    public static void main(String[] args) {
+    public static void main(Manager manager) {
         Scanner scanner = new Scanner(System.in);
         int choice;
 
@@ -21,6 +21,7 @@ public class ManagerApp {
             System.out.println("11. Generate applicants report");
             System.out.println("12. View all enquiries");
             System.out.println("13. View and reply to project enquiries");
+            System.out.println("14. Modify Manager password");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -67,6 +68,9 @@ public class ManagerApp {
                     case 13:
                         viewAndReplyEnquiries();
                         break;
+                    case 14:
+                        modifyManagerPassword(manager);
+                        break;
                     case 0:
                         System.out.println("Exiting Manager App. Goodbye!");
                         break;
@@ -79,8 +83,6 @@ public class ManagerApp {
             }
 
         } while (choice != 0);
-
-        scanner.close();
     }
 
     // You'll need to implement all these methods as static methods
@@ -134,5 +136,24 @@ public class ManagerApp {
 
     private static void viewAndReplyEnquiries() {
         // Implementation here
+    }
+    private static void modifyManagerPassword(Manager manager) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Please enter your new password:");
+            String newPassword = scanner.nextLine();
+            System.out.println("Please confirm your new password:");
+            String confirmPassword = scanner.nextLine();
+            if (newPassword.equals(confirmPassword)) {
+                manager.setPassword(newPassword);
+                System.out.println("Password has been successfully changed!");
+                break;
+            }
+            else  {
+                System.out.println("Passwords do not match!");
+                System.out.println("Please try again.");
+                continue;
+            }
+        }
     }
 }

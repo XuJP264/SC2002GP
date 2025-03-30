@@ -1,5 +1,5 @@
 public class OfficerApp {
-    public static void main(String[] args) {
+    public static void main(Officer officer) {
         System.out.println("Welcome to the Officer App");
     }
 }

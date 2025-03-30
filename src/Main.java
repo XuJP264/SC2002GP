@@ -56,7 +56,7 @@ public class Main {
         if (officer != null) {
             if (officer.getPassword().equals(password)) {
                 System.out.println("Login successful as Officer!");
-                OfficerApp.main(new String[0]);
+                OfficerApp.main(officer);
                 return true;
             } else {
                 System.out.println("Invalid password for Officer account!");
@@ -69,7 +69,7 @@ public class Main {
         if (applicant != null) {
             if (applicant.getPassword().equals(password)) {
                 System.out.println("Login successful as Applicant!");
-                ApplicantApp.main(new String[0]);
+                ApplicantApp.main(applicant);
                 return true;
             } else {
                 System.out.println("Invalid password for Applicant account!");
@@ -82,7 +82,7 @@ public class Main {
         if (manager != null) {
             if (manager.getPassword().equals(password)) {
                 System.out.println("Login successful as Manager!");
-                ManagerApp.main(new String[0]);
+                ManagerApp.main(manager);
                 return true;
             } else {
                 System.out.println("Invalid password for Manager account!");
