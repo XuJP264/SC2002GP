@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Initialization {
+	//Singleton Instance
+	private static Initialization instance = new Initialization();
+	
     // Storage classes to hold the initialized data
     private ApplicantList applicantList;
     private ManagerList managerList;
@@ -18,7 +21,8 @@ public class Initialization {
         this.officerList = new OfficerList();
         this.projectList = new ProjectList();
     }
-
+    public static Initialization getInstance() {
+        return instance;}
     public void initialize() {
         System.out.println("Initializing...");
         this.applicantInitialize();

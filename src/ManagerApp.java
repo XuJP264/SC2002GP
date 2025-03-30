@@ -1,6 +1,7 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ManagerApp {
+public class ManagerApp { 
     public static void main(Manager manager) {
         Scanner scanner = new Scanner(System.in);
         int choice;
@@ -30,13 +31,13 @@ public class ManagerApp {
 
                 switch (choice) {
                     case 1:
-                        createNewBTOProject();
+                        createNewBTOProject(manager);
                         break;
                     case 2:
-                        editBTOProject();
+                        editBTOProject(manager);
                         break;
                     case 3:
-                        deleteBTOProject();
+                        deleteBTOProject(manager);
                         break;
                     case 4:
                         toggleProjectVisibility();
@@ -85,18 +86,152 @@ public class ManagerApp {
         } while (choice != 0);
     }
 
-    // You'll need to implement all these methods as static methods
-    private static void createNewBTOProject() {
-        // Implementation here
+    // implementation of methods 
+    private static void createNewBTOProject(Manager manager) {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("=== Create New BTO Project ==="); //prompting project details
+        
+        System.out.print("Enter Project Name: ");
+        String projectName = scanner.nextLine().trim();
+        
+        System.out.print("Enter Neighbourhood: ");
+        String neighbourhood = scanner.nextLine().trim();
+        
+        //flat type 1:
+        System.out.print("Enter Flat Type 1 (e.g., 2-Room): ");
+        String type1 = scanner.nextLine().trim();
+        System.out.print("Enter number of units for " + type1 + ": ");
+        int type1Units = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Enter price for " + type1 + ": ");
+        double type1Price = Double.parseDouble(scanner.nextLine().trim());
+        
+        //flat type 2
+        System.out.print("Enter Flat Type 2 (e.g., 3-Room): ");
+        String type2 = scanner.nextLine().trim();
+        System.out.print("Enter number of units for " + type2 + ": ");
+        int type2Units = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Enter price for " + type2 + ": ");
+        double type2Price = Double.parseDouble(scanner.nextLine().trim());
+        
+        //application window dates
+        System.out.print("Enter Application Opening Date (yyyy-mm-dd): ");
+        String openingDate = scanner.nextLine().trim();
+        System.out.print("Enter Application Closing Date (yyyy-mm-dd): ");
+        String closingDate = scanner.nextLine().trim();
+        
+        // for simplicity's sake i'm setting a default officer slot and list 
+        int officerSlot = 10;
+        ArrayList<String> officers = new ArrayList<>();
+        
+        // implementation of code to check for active projects for this specific manager, to-be-implemented
+        
+        Project newProject = new Project(
+                projectName, 
+                neighbourhood, 
+                type1, 
+                type1Units, 
+                type1Price, 
+                type2, 
+                type2Units, 
+                type2Price, 
+                openingDate, 
+                closingDate, 
+                manager.getName(), 
+                officerSlot, 
+                officers);
+        
+
+        Initialization init = Initialization.getInstance();  // singleton instance of the initialization adds the project
+        init.getProjectList().addProject(newProject);
+        
+        System.out.println("Project \"" + projectName + "\" created successfully.");
     }
 
-    private static void editBTOProject() {
-        // Implementation here
+    private static void editBTOProject(Manager manager) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // retrieve projectList first
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        
+        // filters project unique to this manager
+        ArrayList<Project> myProjects = new ArrayList<>();
+        for (Project p : projectList.getAllProjects()) {
+            if (p.getManagerName().equals(manager.getName())) {
+                myProjects.add(p);}
+        }
+        
+        if (myProjects.isEmpty()) {
+            System.out.println("You don't have projects to edit.");
+            return;}
+        
+        // display projects
+        System.out.println("Your Projects:");
+        for (int i = 0; i < myProjects.size(); i++) {
+            System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName());}
+        
+        // gets project to edit
+        System.out.println("Enter the number of the project you want to edit:");
+        int choice = Integer.parseInt(scanner.nextLine());
+        if (choice < 1 || choice > myProjects.size()) {
+            System.out.println("Invalid selection.");
+            return;}
+        
+        Project project = myProjects.get(choice - 1);
+        
+        // mini-menu for editing specific fields
+        System.out.println("Which field would you like to edit?");
+        System.out.println("1. Edit Type 1 unit count (e.g., 2-Room)");
+        System.out.println("2. Edit Type 2 unit count (e.g., 3-Room)");
+        System.out.println("3. Edit both Type 1 and Type 2 unit counts");
+        System.out.print("Enter your choice (1-3): ");
+        int fieldChoice = Integer.parseInt(scanner.nextLine());
+        
+        if (fieldChoice == 1 || fieldChoice == 3) {
+            System.out.println("Current number of units for " + project.getType1() + ": " + project.getType1Units());
+            System.out.print("Enter new number of units for " + project.getType1() + ": ");
+            int newType1Units = Integer.parseInt(scanner.nextLine());
+            project.setType1Units(newType1Units);}
+        if (fieldChoice == 2 || fieldChoice == 3) {
+            System.out.println("Current number of units for " + project.getType2() + ": " + project.getType2Units());
+            System.out.print("Enter new number of units for " + project.getType2() + ": ");
+            int newType2Units = Integer.parseInt(scanner.nextLine());
+            project.setType2Units(newType2Units);}
+        System.out.println("Project \"" + project.getProjectName() + "\" updated successfully.");
+    }
+    
+    //deletion 
+    private static void deleteBTOProject(Manager manager) { 
+        Scanner scanner = new Scanner(System.in);
+        ProjectList projectList = Initialization.getInstance().getProjectList(); //might turn this into a helper function actually
+        ArrayList<Project> myProjects = new ArrayList<>();
+        for (Project p : projectList.getAllProjects()) {
+            if (p.getManagerName().equals(manager.getName())) {
+                myProjects.add(p);}
+        }
+        
+        if (myProjects.isEmpty()) {
+            System.out.println("You have no projects to delete.");
+            return;}
+        
+        System.out.println("Your Projects:");
+        for (int i = 0; i < myProjects.size(); i++) {
+            System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName());}
+        
+        System.out.println("Enter the number of the project you want to delete:");
+        int choice = Integer.parseInt(scanner.nextLine());
+        if (choice < 1 || choice > myProjects.size()) {
+            System.out.println("Invalid selection.");
+            return;}
+        
+        Project projectToDelete = myProjects.get(choice - 1);
+        
+        // removes the project using the project name 
+        projectList.getProjects().remove(projectToDelete.getProjectName());
+        
+        System.out.println("Project \"" + projectToDelete.getProjectName() + "\" deleted successfully.");
     }
 
-    private static void deleteBTOProject() {
-        // Implementation here
-    }
 
     private static void toggleProjectVisibility() {
         // Implementation here

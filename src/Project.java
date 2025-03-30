@@ -15,6 +15,7 @@ public class Project {
     private String managerName;
     private int officerSlot;
     private ArrayList<String> officers;
+    private boolean visible = true;
 
     public Project(String projectName, String neighborhood,
                    String type1, int type1Units, double type1Price,
@@ -51,10 +52,12 @@ public class Project {
     public String getManagerName() { return managerName; }
     public int getOfficerSlot() { return officerSlot; }
     public ArrayList<String> getOfficers() { return new ArrayList<>(officers); }
+    public boolean isVisible() { return visible; }
 
     // Setters
     public void setType1Units(int units) { type1Units = units; }
     public void setType2Units(int units) { type2Units = units; }
     public void addOfficer(String officer) { officers.add(officer); }
     public void removeOfficer(String officer) { officers.remove(officer); }
+    public void setVisible(boolean visible) {this.visible = visible;}
 }
