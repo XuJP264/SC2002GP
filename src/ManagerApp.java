@@ -122,18 +122,19 @@ public class ManagerApp {
         System.out.print("Enter Application Closing Date (yyyy-mm-dd): ");
         String closingDate = scanner.nextLine().trim();
         
+        /*
         //validation for the dates, i coudlnt get it working so im just gonna fix this when i can haha
-        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d"); 
-        //LocalDate openDate, closeDate;
-        //try {
-        	//openDate = LocalDate.parse(openingDate, formatter);
-        	//closeDate = LocalDate.parse(closingDate,formatter);
-        	//if (closeDate.isBefore(openDate)) {
-               //System.out.println("Closing date cannot be before opening date.");
-                //return;}
-        //}catch (Exception e) {
-        	//System.out.println("Invalid date format. Please use yyyy/M/d instead.");
-        	//return;}
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d"); 
+        LocalDate openDate, closeDate;
+        try {
+        	openDate = LocalDate.parse(openingDate, formatter);
+        	closeDate = LocalDate.parse(closingDate,formatter);
+        	if (closeDate.isBefore(openDate)) {
+               System.out.println("Closing date cannot be before opening date.");
+                return;}
+        }catch (Exception e) {
+        	System.out.println("Invalid date format. Please use yyyy/M/d instead.");
+        	return;} */
         
         // implementation of code to check for active projects for this specific manager, to-be-implemented
         boolean overlapExists = false;
@@ -280,9 +281,7 @@ public class ManagerApp {
             return;}
         
         Project projectToDelete = myProjects.get(choice - 1);
-        
-        // removes the project using the project name 
-        projectList.getProjects().remove(projectToDelete.getProjectName());
+        projectList.removeProject(projectToDelete.getProjectName()); //actually removes the project from the internal hash :)
         
         System.out.println("Project \"" + projectToDelete.getProjectName() + "\" deleted successfully.");
     }
@@ -314,8 +313,11 @@ public class ManagerApp {
 
 
     private static void viewAllProjects() {
-        // Implementation here
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        // true to show hidden projects too
+        projectList.showProjectList(true);
     }
+
 
     private static void viewMyProjects() {
         // Implementation here

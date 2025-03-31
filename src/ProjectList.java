@@ -23,6 +23,10 @@ public class ProjectList {
     public boolean containsProject(String projectName) {
         return projects.containsKey(projectName);
     }
+    
+    public void removeProject(String projectName) { //delete functionality for managers
+        projects.remove(projectName);
+    }
 
     /**
      * Displays all projects in a formatted table
