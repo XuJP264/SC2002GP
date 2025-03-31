@@ -59,8 +59,12 @@ public class RegistrationList {
             }
         }
     }
-    public static HashMap<Project,Boolean> getRegistrationCondition(Officer officer) {
-        return new HashMap<>(registrationConditions.get(officer))    ;
+    public static HashMap<Project, Boolean> getRegistrationCondition(Officer officer) {
+        // 获取该officer的注册状态Map（可能为null）
+        HashMap<Project, Boolean> conditions = registrationConditions.get(officer);
+
+        // 如果为null则返回空HashMap，否则返回拷贝
+        return conditions != null ? new HashMap<>(conditions) : new HashMap<>();
     }
     // Displays all registrations in a formatted way
     public static void displayRegistrations() {

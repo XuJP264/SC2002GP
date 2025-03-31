@@ -9,7 +9,7 @@ public class OfficerApp extends ApplicantApp {
 
         System.out.println("Welcome to HDB Officer Portal");
         System.out.println("Logged in as: " + officer.getName() + " (" + officer.getNRIC() + ")");
-
+        offierInitiate(officer);
         while (true) {
             displayMainMenu();
 
@@ -17,13 +17,24 @@ public class OfficerApp extends ApplicantApp {
 
             if (choice == 0) {
                 System.out.println("Logging out... Goodbye!");
-                scanner.close();
                 return;
             }
             processUserChoice(officer, choice);
         }
     }
-
+    private static void offierInitiate(Officer officer) {
+        // check the initialized project list
+        Initialization initialization = Initialization.getInstance();
+        ProjectList projectList = initialization.getProjectList();
+        // check the registration list
+        for (Project p : projectList.getProjects().values()){
+            if (containsName(p.getOfficers(), officer.getName())) {
+                officer.addProjectInCharge(p);
+//                System.out.println(p.getProjectName());
+            }
+        }
+        System.out.println("the Initalization is done");
+    }
     private static void displayMainMenu() {
         System.out.println("\n=== MAIN MENU ===");
 
@@ -178,14 +189,27 @@ public class OfficerApp extends ApplicantApp {
         System.out.println("Registration request sent to the project manager.");
     }
     public static void viewRegistrationStatus(Officer officer) {
-        //show the list of projects you are registered for and their status
-        HashMap<Project,Boolean> projects = RegistrationList.getRegistrationCondition(officer);
-        for (Project p : projects.keySet()) {
-            System.out.println(p.getProjectName() + " - " + (projects.get(p) ? "Accepted" : "Unaccepted"));
+        HashMap<Project, Boolean> projects = RegistrationList.getRegistrationCondition(officer);
+
+        if (projects.isEmpty()) {
+            System.out.println("Warning: You have not registered for any projects yet.");
+            return;
         }
+
+        System.out.println("You have registered for the following projects:");
+        projects.forEach((project, isAccepted) ->
+                System.out.printf("- %s : %s\n",
+                        project.getProjectName(),
+                        isAccepted ? "accepted" : "unaccepted"
+                )
+        );
     }
     public static void viewManagedProjectDetails(Officer officer) {
         ArrayList<Project> projects = officer.getProjectsInCharge();
+        if (projects.isEmpty()) {
+            System.out.println("Warning: You have not registered for any projects yet.");
+            return;
+        }
         for (Project p : projects){
             System.out.println(p.getProjectName());
             System.out.println("Neighborhood: " + p.getNeighborhood());
