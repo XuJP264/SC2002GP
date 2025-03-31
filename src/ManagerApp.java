@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class ManagerApp { 
     public static void main(Manager manager) {
@@ -40,7 +42,7 @@ public class ManagerApp {
                         deleteBTOProject(manager);
                         break;
                     case 4:
-                        toggleProjectVisibility();
+                        toggleProjectVisibility(manager);
                         break;
                     case 5:
                         viewAllProjects();
@@ -89,16 +91,16 @@ public class ManagerApp {
     // implementation of methods 
     private static void createNewBTOProject(Manager manager) {
         Scanner scanner = new Scanner(System.in);
+        Initialization init = Initialization.getInstance(); //// singleton instance of the initialization adds the project
+        ProjectList projectList = init.getProjectList(); 
         
         System.out.println("=== Create New BTO Project ==="); //prompting project details
-        
         System.out.print("Enter Project Name: ");
         String projectName = scanner.nextLine().trim();
-        
         System.out.print("Enter Neighbourhood: ");
         String neighbourhood = scanner.nextLine().trim();
         
-        //flat type 1:
+        //flat type 1
         System.out.print("Enter Flat Type 1 (e.g., 2-Room): ");
         String type1 = scanner.nextLine().trim();
         System.out.print("Enter number of units for " + type1 + ": ");
@@ -120,85 +122,138 @@ public class ManagerApp {
         System.out.print("Enter Application Closing Date (yyyy-mm-dd): ");
         String closingDate = scanner.nextLine().trim();
         
+        //validation for the dates, i coudlnt get it working so im just gonna fix this when i can haha
+        //DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d"); 
+        //LocalDate openDate, closeDate;
+        //try {
+        	//openDate = LocalDate.parse(openingDate, formatter);
+        	//closeDate = LocalDate.parse(closingDate,formatter);
+        	//if (closeDate.isBefore(openDate)) {
+               //System.out.println("Closing date cannot be before opening date.");
+                //return;}
+        //}catch (Exception e) {
+        	//System.out.println("Invalid date format. Please use yyyy/M/d instead.");
+        	//return;}
+        
+        // implementation of code to check for active projects for this specific manager, to-be-implemented
+        boolean overlapExists = false;
+        for (Project p : projectList.getAllProjects()) {
+            if (p.getManagerName().equals(manager.getName())) {
+                if (DateUtils.isOverlapping(p.getOpeningDate(), p.getClosingDate(), openingDate, closingDate)) {
+                    overlapExists = true;
+                    break;}}}
+        if (overlapExists) {
+            System.out.println("You already have an active project with an overlapping application window. Cannot create another.");
+            return;}
+        
         // for simplicity's sake i'm setting a default officer slot and list 
         int officerSlot = 10;
         ArrayList<String> officers = new ArrayList<>();
         
-        // implementation of code to check for active projects for this specific manager, to-be-implemented
         
         Project newProject = new Project(
-                projectName, 
-                neighbourhood, 
-                type1, 
-                type1Units, 
-                type1Price, 
-                type2, 
-                type2Units, 
-                type2Price, 
-                openingDate, 
-                closingDate, 
-                manager.getName(), 
-                officerSlot, 
-                officers);
-        
+                projectName, neighbourhood, 
+                type1, type1Units, 
+                type1Price, type2, 
+                type2Units, type2Price, 
+                openingDate, closingDate, 
+                manager.getName(), officerSlot, officers);
 
-        Initialization init = Initialization.getInstance();  // singleton instance of the initialization adds the project
         init.getProjectList().addProject(newProject);
         
         System.out.println("Project \"" + projectName + "\" created successfully.");
     }
 
+    //edit projects
     private static void editBTOProject(Manager manager) {
         Scanner scanner = new Scanner(System.in);
-        
-        // retrieve projectList first
         ProjectList projectList = Initialization.getInstance().getProjectList();
-        
-        // filters project unique to this manager
         ArrayList<Project> myProjects = new ArrayList<>();
         for (Project p : projectList.getAllProjects()) {
             if (p.getManagerName().equals(manager.getName())) {
                 myProjects.add(p);}
         }
-        
         if (myProjects.isEmpty()) {
-            System.out.println("You don't have projects to edit.");
+            System.out.println("You don't have any projects to edit.");
             return;}
-        
-        // display projects
         System.out.println("Your Projects:");
         for (int i = 0; i < myProjects.size(); i++) {
-            System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName());}
-        
-        // gets project to edit
-        System.out.println("Enter the number of the project you want to edit:");
+            System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName());
+            }
+        System.out.print("Enter the number of the project you want to edit: ");
         int choice = Integer.parseInt(scanner.nextLine());
         if (choice < 1 || choice > myProjects.size()) {
             System.out.println("Invalid selection.");
-            return;}
-        
+            return;
+}
         Project project = myProjects.get(choice - 1);
         
-        // mini-menu for editing specific fields
-        System.out.println("Which field would you like to edit?");
-        System.out.println("1. Edit Type 1 unit count (e.g., 2-Room)");
-        System.out.println("2. Edit Type 2 unit count (e.g., 3-Room)");
-        System.out.println("3. Edit both Type 1 and Type 2 unit counts");
-        System.out.print("Enter your choice (1-3): ");
+        System.out.println("Editing Project: " + project.getProjectName());
+        System.out.println("Select the field to edit:");
+        System.out.println("1. Type 1 Units");
+        System.out.println("2. Type 2 Units");
+        System.out.println("3. Type 1 Price");
+        System.out.println("4. Type 2 Price");
+        System.out.println("5. Application Dates");
+        System.out.print("Enter your choice (1-5): ");
         int fieldChoice = Integer.parseInt(scanner.nextLine());
         
-        if (fieldChoice == 1 || fieldChoice == 3) {
-            System.out.println("Current number of units for " + project.getType1() + ": " + project.getType1Units());
-            System.out.print("Enter new number of units for " + project.getType1() + ": ");
-            int newType1Units = Integer.parseInt(scanner.nextLine());
-            project.setType1Units(newType1Units);}
-        if (fieldChoice == 2 || fieldChoice == 3) {
-            System.out.println("Current number of units for " + project.getType2() + ": " + project.getType2Units());
-            System.out.print("Enter new number of units for " + project.getType2() + ": ");
-            int newType2Units = Integer.parseInt(scanner.nextLine());
-            project.setType2Units(newType2Units);}
-        System.out.println("Project \"" + project.getProjectName() + "\" updated successfully.");
+        switch(fieldChoice) {
+            case 1:
+                System.out.println("Current Type 1 Units: " + project.getType1Units());
+                System.out.print("Enter new Type 1 Units: ");
+                int newUnits1 = Integer.parseInt(scanner.nextLine());
+                project.setType1Units(newUnits1);
+                break;
+            case 2:
+                System.out.println("Current Type 2 Units: " + project.getType2Units());
+                System.out.print("Enter new Type 2 Units: ");
+                int newUnits2 = Integer.parseInt(scanner.nextLine());
+                project.setType2Units(newUnits2);
+                break;
+            case 3:
+                System.out.println("Current Type 1 Price: " + project.getType1Price());
+                System.out.print("Enter new Type 1 Price: ");
+                double newPrice1 = Double.parseDouble(scanner.nextLine());
+                project.setType1Price(newPrice1);
+                break;
+            case 4:
+                System.out.println("Current Type 2 Price: " + project.getType2Price());
+                System.out.print("Enter new Type 2 Price: ");
+                double newPrice2 = Double.parseDouble(scanner.nextLine());
+                project.setType2Price(newPrice2);
+                break;
+            case 5:
+                System.out.println("Current Opening Date: " + project.getOpeningDate());
+                System.out.println("Current Closing Date: " + project.getClosingDate());
+                System.out.print("Enter new Opening Date (yyyy/M/d): ");
+                String newOpeningDate = scanner.nextLine().trim();
+                System.out.print("Enter new Closing Date (yyyy/M/d): ");
+                String newClosingDate = scanner.nextLine().trim();
+                
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d");
+                LocalDate newOpenDate, newCloseDate;
+                try {
+                    newOpenDate = LocalDate.parse(newOpeningDate, formatter);
+                    newCloseDate = LocalDate.parse(newClosingDate, formatter);
+                    if (newCloseDate.isBefore(newOpenDate)) {
+                        System.out.println("Closing date cannot be before opening date.");
+                        return;
+                    }
+                } catch(Exception e) {
+                    System.out.println("Invalid date format. Use yyyy/M/d.");
+                    return;
+                }
+                project.setOpeningDate(newOpeningDate);
+                project.setClosingDate(newClosingDate);
+                break;
+            default:
+                System.out.println("Invalid choice.");
+                return;
+        }
+        System.out.println("Project updated successfully.");
     }
+
     
     //deletion 
     private static void deleteBTOProject(Manager manager) { 
@@ -233,9 +288,30 @@ public class ManagerApp {
     }
 
 
-    private static void toggleProjectVisibility() {
-        // Implementation here
-    }
+    private static void toggleProjectVisibility(Manager manager) {
+        Scanner scanner = new Scanner(System.in);
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        ArrayList<Project> myProjects = new ArrayList<>();
+        for (Project p : projectList.getAllProjects()) {
+            if (p.getManagerName().equals(manager.getName())) {
+                myProjects.add(p);}}
+        if (myProjects.isEmpty()) {
+            System.out.println("You don't have any projects to toggle.");
+            return;}
+        System.out.println("Your Projects:");
+        for (int i = 0; i < myProjects.size(); i++) {
+            String status = myProjects.get(i).isVisible() ? "Visible" : "Hidden";
+            System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName() + " - " + status);}
+        System.out.print("Enter the number of the project to toggle visibility: ");
+        int choice = Integer.parseInt(scanner.nextLine());
+        if (choice < 1 || choice > myProjects.size()) {
+            System.out.println("Invalid selection.");
+            return;}
+        Project project = myProjects.get(choice - 1);
+        project.setVisible(!project.isVisible());
+        System.out.println("Project \"" + project.getProjectName() + "\" visibility toggled to " +
+                (project.isVisible() ? "Visible" : "Hidden") + ".");}
+
 
     private static void viewAllProjects() {
         // Implementation here

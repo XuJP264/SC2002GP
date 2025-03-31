@@ -60,4 +60,9 @@ public class Project {
     public void addOfficer(String officer) { officers.add(officer); }
     public void removeOfficer(String officer) { officers.remove(officer); }
     public void setVisible(boolean visible) {this.visible = visible;}
+    public void setType1Price(double price) {this.type1Price = price;}
+    public void setType2Price(double price) {this.type2Price = price;}
+    public void setOpeningDate(String openingDate) {this.openingDate = openingDate;}
+    public void setClosingDate(String closingDate) {this.closingDate = closingDate;}
+
 }
