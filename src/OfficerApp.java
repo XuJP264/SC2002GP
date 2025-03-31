@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
@@ -5,125 +6,122 @@ import java.util.List;
 public class OfficerApp extends ApplicantApp {
     public static void main(Officer officer) {
         Scanner scanner = new Scanner(System.in);
-        int choice;
 
-        System.out.println("Welcome to Officer App");
-        do {
-            System.out.println("\nPlease select an option:");
-            // Inherited applicant capabilities
-            System.out.println("1. View available projects");
-            System.out.println("2. Apply for a project");
-            System.out.println("3. View my application status");
-            System.out.println("4. Request application withdrawal");
-            System.out.println("5. Submit enquiry");
-            System.out.println("6. View my enquiries");
-            System.out.println("7. Edit enquiry");
-            System.out.println("8. Delete enquiry");
+        System.out.println("Welcome to HDB Officer Portal");
+        System.out.println("Logged in as: " + officer.getName() + " (" + officer.getNRIC() + ")");
 
-            // Officer-specific capabilities
-            System.out.println("9. Register to join project");
-            System.out.println("10. View registration status");
-            System.out.println("11. View managed project details");
-            System.out.println("12. Process BTO applications (Approve/Reject)");
-            System.out.println("13. Process withdrawal requests (Approve/Reject)");
-            System.out.println("14. Assist applicant in booking a unit");
-            System.out.println("15. View all applications");
-            System.out.println("16. Generate applicants report");
-            System.out.println("17. Generate booking receipt");
-            System.out.println("18. View and reply to enquiries");
-            System.out.println("19. Update remaining flat units");
-            System.out.println("20. Retrieve applicant by NRIC");
-            System.out.println("21. Update application status to booked");
-            System.out.println("22. Update applicant's flat type");
-            System.out.println("0. Exit");
-            System.out.print("Enter your choice: ");
+        while (true) {
+            displayMainMenu();
+
+            int choice = getValidChoice(scanner, 0, 16);
+
+            if (choice == 0) {
+                System.out.println("Logging out... Goodbye!");
+                scanner.close();
+                return;
+            }
+            processUserChoice(officer, choice);
+        }
+    }
+
+    private static void displayMainMenu() {
+        System.out.println("\n=== MAIN MENU ===");
+
+        System.out.println("\n[Applicant Functions]");
+        System.out.println("1. View available projects");
+        System.out.println("2. Apply for a project");
+        System.out.println("3. View my application status");
+        System.out.println("4. Request application withdrawal");
+        System.out.println("5. Submit enquiry");
+        System.out.println("6. View my enquiries");
+        System.out.println("7. Edit enquiry");
+        System.out.println("8. Delete enquiry");
+
+        System.out.println("\n[Officer Functions]");
+        System.out.println("9. Register to manage a project");
+        System.out.println("10. View registration status");
+        System.out.println("11. View managed project details");
+        System.out.println("12. Process withdrawal requests");
+        System.out.println("13. Assist applicant in booking");
+        System.out.println("14. View all applications");
+        System.out.println("15. Generate booking receipt");
+        System.out.println("16. View and reply to enquiries");
+        System.out.println("\n0. Logout");
+    }
+
+    private static int getValidChoice(Scanner scanner, int min, int max) {
+        while (true) {
+            System.out.print("Enter your choice (" + min + "-" + max + "): ");
+            String input = scanner.nextLine();
 
             try {
-                choice = Integer.parseInt(scanner.nextLine());
-
-                switch (choice) {
-                    // Inherited applicant functions
-                    case 1:
-                        viewAvailableProjects(officer);
-                        break;
-                    case 2:
-                        applyForProject(officer);
-                        break;
-                    case 3:
-                        viewApplicationStatus(officer);
-                        break;
-                    case 4:
-                        requestWithdrawal(officer);
-                        break;
-                    case 5:
-                        submitEnquiry(officer);
-                        break;
-                    case 6:
-                        viewEnquiries(officer);
-                        break;
-                    case 7:
-                        editEnquiry(officer);
-                        break;
-                    case 8:
-                        deleteEnquiry(officer);
-                        break;
-
-                    // Officer-specific functions
-                    case 9:
-                        registerForProject(officer);
-                        break;
-                    case 10:
-                        viewRegistrationStatus(officer);
-                        break;
-                    case 11:
-                        viewManagedProjectDetails(officer);
-                        break;
-                    case 12:
-                        processBTOApplications(officer);
-                        break;
-                    case 13:
-                        processWithdrawalRequests(officer);
-                        break;
-                    case 14:
-                        assistFlatBooking(officer);
-                        break;
-                    case 15:
-                        viewAllApplications(officer);
-                        break;
-                    case 16:
-                        generateApplicantsReport(officer);
-                        break;
-                    case 17:
-                        generateBookingReceipt(officer);
-                        break;
-                    case 18:
-                        viewAndReplyEnquiries(officer);
-                        break;
-                    case 19:
-                        updateRemainingUnits(officer);
-                        break;
-                    case 20:
-                        retrieveApplicantByNRIC(officer);
-                        break;
-                    case 21:
-                        updateStatusToBooked(officer);
-                        break;
-                    case 22:
-                        updateApplicantFlatType(officer);
-                        break;
-                    case 0:
-                        System.out.println("Exiting Officer App. Goodbye!");
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please enter a number between 0 and 22.");
+                int choice = Integer.parseInt(input);
+                if (choice >= min && choice <= max) {
+                    return choice;
+                } else {
+                    System.out.println("Please enter a number between " + min + " and " + max + ".");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                choice = -1;
+                System.out.println("Invalid input. Please enter a valid number.");
             }
-
-        } while (choice != 0);
+        }
     }
+
+    private static void processUserChoice(Officer officer, int choice) {
+        switch (choice) {
+            case 1:
+                viewAvailableProjects(officer);
+                break;
+            case 2:
+                applyForProject(officer);
+                break;
+            case 3:
+                viewApplicationStatus(officer);
+                break;
+            case 4:
+                requestWithdrawal(officer);
+                break;
+            case 5:
+                submitEnquiry(officer);
+                break;
+            case 6:
+                viewEnquiries(officer);
+                break;
+            case 7:
+                editEnquiry(officer);
+                break;
+            case 8:
+                deleteEnquiry(officer);
+                break;
+            case 9:
+                registerForProject(officer);
+                break;
+            case 10:
+                viewRegistrationStatus(officer);
+                break;
+            case 11:
+                viewManagedProjectDetails(officer);
+                break;
+            case 12:
+                processWithdrawalRequests(officer);
+                break;
+            case 13:
+                assistFlatBooking(officer);
+                break;
+            case 14:
+                viewAllApplications(officer);
+                break;
+            case 15:
+                generateBookingReceipt(officer);
+                break;
+            case 16:
+                viewAndReplyEnquiries(officer);
+                break;
+            default:
+                System.out.println("Invalid choice. Please try again.");
+        }
+    }
+
 
     // Inherited from ApplicantApp
     private static void viewAvailableProjects(Officer officer) {}
@@ -179,19 +177,50 @@ public class OfficerApp extends ApplicantApp {
         RegistrationList.addRegistration(officer,project);
         System.out.println("Registration request sent to the project manager.");
     }
-    private static void viewRegistrationStatus(Officer officer) {}
-    private static void viewManagedProjectDetails(Officer officer) {}
-    private static void processBTOApplications(Officer officer) {}
-    private static void processWithdrawalRequests(Officer officer) {}
-    private static void assistFlatBooking(Officer officer) {}
-    private static void viewAllApplications(Officer officer) {}
-    private static void generateApplicantsReport(Officer officer) {}
-    private static void generateBookingReceipt(Officer officer) {}
-    private static void viewAndReplyEnquiries(Officer officer) {}
-    private static void updateRemainingUnits(Officer officer) {}
-    private static void retrieveApplicantByNRIC(Officer officer) {}
-    private static void updateStatusToBooked(Officer officer) {}
-    private static void updateApplicantFlatType(Officer officer) {}
+    public static void viewRegistrationStatus(Officer officer) {
+        //show the list of projects you are registered for and their status
+        HashMap<Project,Boolean> projects = RegistrationList.getRegistrationCondition(officer);
+        for (Project p : projects.keySet()) {
+            System.out.println(p.getProjectName() + " - " + (projects.get(p) ? "Accepted" : "Unaccepted"));
+        }
+    }
+    public static void viewManagedProjectDetails(Officer officer) {
+        ArrayList<Project> projects = officer.getProjectsInCharge();
+        for (Project p : projects){
+            System.out.println(p.getProjectName());
+            System.out.println("Neighborhood: " + p.getNeighborhood());
+            System.out.println("Type 1: " + p.getType1() + " - " + p.getType1Units() + " units - " + p.getType1Price() + " per unit");
+            System.out.println("Type 2: " + p.getType2() + " - " + p.getType2Units() + " units - " + p.getType2Price() + " per unit");
+            System.out.println("Opening date: " + p.getOpeningDate());
+            System.out.println("Closing date: " + p.getClosingDate());
+            System.out.println("Officer slot: " + p.getOfficerSlot());
+            System.out.println("Officers: " + p.getOfficers());
+            System.out.println();
+        }
+    }
+    public static void processWithdrawalRequests(Officer officer) {}
+    public static void assistFlatBooking(Officer officer) {}
+    public static void viewAllApplications(Officer officer) {}
+    public static void generateBookingReceipt(Officer officer) {}
+    public static void viewAndReplyEnquiries(Officer officer) {}
+    public static void modifyPassword(Officer officer) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Please enter your new password:");
+            String newPassword = scanner.nextLine();
+            System.out.println("Please confirm your new password:");
+            String confirmPassword = scanner.nextLine();
+            if (newPassword.equals(confirmPassword)) {
+                officer.setPassword(newPassword);
+                System.out.println("Password has been successfully changed!");
+                break;
+            } else {
+                System.out.println("Passwords do not match!");
+                System.out.println("Please try again.");
+                continue;
+            }
+        }
+    }
     public static boolean containsName(List<String> list, String target) {
         for (String str : list) {
             if (str.contains(target)) { // 判断 target 是否是 str 的子串

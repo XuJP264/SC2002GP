@@ -94,15 +94,18 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        Scanner mainScanner = new Scanner(System.in);
+
         while (true) {
             System.out.println("\n=== Housing Application System ===");
             System.out.println("1. Login");
             System.out.println("2. Exit");
             System.out.print("Please enter your choice (1-2): ");
 
+            String input = mainScanner.nextLine();  // 先读取为字符串
+
             try {
-                int choice = mainScanner.nextInt();
-                mainScanner.nextLine(); // 清除换行符
+                int choice = Integer.parseInt(input);
 
                 switch (choice) {
                     case 1:
@@ -115,9 +118,8 @@ public class Main {
                     default:
                         System.out.println("Invalid choice. Please enter 1 or 2.");
                 }
-            } catch (Exception e) {
-                System.out.println("Invalid input. Please enter a number.");
-                mainScanner.nextLine(); // 清除错误输入
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number (1 or 2).");
             }
         }
     }

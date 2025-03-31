@@ -39,10 +39,10 @@ class Officer extends UserCard {
     public void removeProjectInCharge(Project project) {
         projectsInCharge.remove(project);
     }
-    public List<Project> getProjectsHaveApplied() {
+    public ArrayList<Project> getProjectsHaveApplied() {
         return new ArrayList<>(projectsHaveApplied);
     }
-    public List<Project> getProjectsInCharge() {
+    public ArrayList<Project> getProjectsInCharge() {
         return new ArrayList<>(projectsInCharge);
     }
     public String getIdentity() {

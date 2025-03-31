@@ -10,4 +10,22 @@ class Manager extends UserCard {
     public String getIdentity() {
         return identity;
     }
+    public String getName() {
+        return super.getName();
+    }
+    public int getAge() {
+        return super.getAge();
+    }
+    public String getNRIC() {
+        return super.getNRIC();
+    }
+    public String getMaritalStatus() {
+        return super.getMaritalStatus();
+    }
+    public String getPassword() {
+        return super.getPassword();
+    }
+    public void setPassword(String password) {
+        super.setPassword(password);
+    }
 }
