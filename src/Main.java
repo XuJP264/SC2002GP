@@ -7,9 +7,8 @@ public class Main {
     private static final String REGEX = "^[ST]\\d{7}[A-Za-z]$";
     private static Initialization initialization;
     private static Scanner mainScanner = new Scanner(System.in);
-
     static {
-        Initialization initialization = Initialization.getInstance();
+        initialization = Initialization.getInstance(); // 正确赋值
         initialization.initialize();
     }
     public static boolean isLegal(String username) {

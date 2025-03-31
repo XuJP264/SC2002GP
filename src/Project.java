@@ -51,7 +51,7 @@ public class Project {
     public String getClosingDate() { return closingDate; }
     public String getManagerName() { return managerName; }
     public int getOfficerSlot() { return officerSlot; }
-    public ArrayList<String> getOfficers() { return new ArrayList<>(officers); }
+    public ArrayList<String> getOfficers() { return officers; }
     public boolean isVisible() { return visible; }
 
     // Setters

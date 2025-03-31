@@ -1,19 +1,7 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-import java.util.Locale;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.util.InputMismatchException;
-import java.util.NoSuchElementException;
+
 public class OfficerApp extends ApplicantApp {
     public static void main(Officer officer) {
         Scanner scanner = new Scanner(System.in);
@@ -167,7 +155,8 @@ public class OfficerApp extends ApplicantApp {
             return;
         }
         //check if the project has already been registered by you
-        if(project.getOfficers().contains(officer.getName())){
+        ArrayList<String> officersName = project.getOfficers();
+        if(containsName(officersName, officer.getName())) {
             System.out.println("You are already registered for this project.");
             return;
         }
@@ -203,4 +192,12 @@ public class OfficerApp extends ApplicantApp {
     private static void retrieveApplicantByNRIC(Officer officer) {}
     private static void updateStatusToBooked(Officer officer) {}
     private static void updateApplicantFlatType(Officer officer) {}
+    public static boolean containsName(List<String> list, String target) {
+        for (String str : list) {
+            if (str.contains(target)) { // 判断 target 是否是 str 的子串
+                return true;
+            }
+        }
+        return false;
+    }
 }

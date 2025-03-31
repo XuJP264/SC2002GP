@@ -34,42 +34,40 @@ public class ProjectList {
             return;
         }
 
-        // Table header
-        System.out.println("\n=== PROJECT LIST ===");
-        System.out.println("------------------------------------------------------------------------------------------------");
-        System.out.printf("%-3s %-20s %-15s %-12s %-12s %-10s %-10s %-8s %-15s\n",
-                "#", "Project Name", "Neighborhood", "Type 1", "Type 2", "Open Date", "Close Date", "Slots", "Manager");
-        System.out.println("------------------------------------------------------------------------------------------------");
+        System.out.println("\n=== Project List (Detailed View) ===");
+        System.out.println("Total projects: " + projects.size());
+        System.out.println("-----------------------------------------------");
 
-        // Display each project
         int index = 1;
         for (Project project : projects.values()) {
-            if (!showHidden && !project.isVisible()) {
-                continue;  // Skip hidden projects unless explicitly requested
-            }
+            if (!showHidden && !project.isVisible()) continue;
 
-            System.out.printf("%-3d %-20s %-15s %-12s %-12s %-10s %-10s %-8d %-15s\n",
-                    index++,
-                    project.getProjectName(),
-                    project.getNeighborhood(),
-                    project.getType1(),
-                    project.getType2(),
-                    project.getOpeningDate(),
-                    project.getClosingDate(),
-                    project.getOfficerSlot() - project.getOfficers().size(),  // Available slots
-                    project.getManagerName());
+            // 项目基础信息
+            System.out.println(index++ + ". Project Name: " + project.getProjectName());
+            System.out.println("   Neighborhood: " + project.getNeighborhood());
+            System.out.println("   Visibility: " + (project.isVisible() ? "Visible" : "Hidden"));
 
-            // Display additional project details if needed
-            System.out.printf("     %s units @ $%.2f, %s units @ $%.2f\n",
-                    project.getType1Units(), project.getType1Price(),
-                    project.getType2Units(), project.getType2Price());
+            // 户型详细信息
+            System.out.printf("   Type 1: %-8s | Units: %-4d | Price: $%.2f\n",
+                    project.getType1(), project.getType1Units(), project.getType1Price());
+            System.out.printf("   Type 2: %-8s | Units: %-4d | Price: $%.2f\n",
+                    project.getType2(), project.getType2Units(), project.getType2Price());
+
+            // 时间信息
+            System.out.println("   Dates: " + project.getOpeningDate() + " - " + project.getClosingDate());
+
+            // 人员信息
+            System.out.println("   Manager: " + project.getManagerName());
+            System.out.println("   Officer Slots: " +
+                    (project.getOfficerSlot() - project.getOfficers().size()) + "/" +
+                    project.getOfficerSlot() + " available");
+            System.out.println("   Assigned Officers: " + project.getOfficers());
+
+            System.out.println("-----------------------------------------------");
         }
-        System.out.println("------------------------------------------------------------------------------------------------");
     }
 
-    /**
-     * Overloaded method that shows only visible projects by default
-     */
+    // 保留原有的默认方法
     public void showProjectList() {
         showProjectList(false);
     }
