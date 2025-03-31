@@ -15,7 +15,7 @@ public class Initialization {
     private OfficerList officerList;
     private ProjectList projectList;
 
-    public Initialization() {
+    private Initialization() {
         this.applicantList = new ApplicantList();
         this.managerList = new ManagerList();
         this.officerList = new OfficerList();
@@ -184,16 +184,15 @@ public class Initialization {
 
                     // Officer info
                     int officerSlot = Integer.parseInt(data[11].trim());
-                    String[] officers = data[12].trim().split(",");
+                    String[] officers = data[12].trim().split(" ");
                     ArrayList<String> officerList = new ArrayList<>(Arrays.asList(officers));
-
                     Project project = new Project(projectName, neighborhood,
                             type1, type1Units, type1Price,
                             type2, type2Units, type2Price,
                             openingDate, closingDate,
                             managerName, officerSlot, officerList);
 
-                    projectList.getProjects().put(projectName, project);
+                    projectList.addProject(project);
                 }
             }
 

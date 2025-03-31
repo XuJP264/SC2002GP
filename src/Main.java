@@ -9,7 +9,7 @@ public class Main {
     private static Scanner mainScanner = new Scanner(System.in);
 
     static {
-        initialization = new Initialization();
+        Initialization initialization = Initialization.getInstance();
         initialization.initialize();
     }
     public static boolean isLegal(String username) {
