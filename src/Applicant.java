@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 class Applicant extends UserCard {
     private String identity;
@@ -47,4 +46,13 @@ class Applicant extends UserCard {
     public List<String> getInquiries() {
         return inquiries;
     }
+
+    public void setAppliedProject(String appliedProject) {
+        this.appliedProject = appliedProject;
+    }
+    public void setApplicationStatus(String status) {
+        this.applicationStatus = status;
+    }
+    
 }
+
