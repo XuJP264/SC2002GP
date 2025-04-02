@@ -36,7 +36,7 @@ public class ApplicantApp {
         System.out.println("0. Logout");
     }
 
-    private static int getValidChoice(Scanner scanner, int min, int max) {
+    protected static int getValidChoice(Scanner scanner, int min, int max) {
         while (true) {
             System.out.print("Enter your choice (" + min + "-" + max + "): ");
             try {
@@ -47,7 +47,7 @@ public class ApplicantApp {
         }
     }
 
-    private static void processChoice(Applicant applicant, Scanner scanner, int choice) {
+    protected static void processChoice(Applicant applicant, Scanner scanner, int choice) {
         switch (choice) {
             case 1 -> viewEligibleProjects(applicant);
             case 2 -> applyForProject(applicant, scanner);
@@ -60,7 +60,7 @@ public class ApplicantApp {
         }
     }
 
-    private static void viewEligibleProjects(Applicant applicant) {
+    protected static void viewEligibleProjects(Applicant applicant) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
         boolean hasProjects = false;
 
@@ -77,7 +77,7 @@ public class ApplicantApp {
         }
     }
 
-    private static boolean isEligible(Applicant applicant, Project p) {
+    protected static boolean isEligible(Applicant applicant, Project p) {
         String status = applicant.getMaritalStatus();
         int age = applicant.getAge();
         if (status.equalsIgnoreCase("Single") && age >= 35) {
@@ -89,7 +89,7 @@ public class ApplicantApp {
         return false;
     }
 
-    private static void displayProjectDetails(Project p) {
+    protected static void displayProjectDetails(Project p) {
         System.out.println("- " + p.getProjectName() + " (" + p.getNeighborhood() + ")");
         System.out.printf("  Type1: %s (%d units) - $%.2f\n", p.getType1(), p.getType1Units(), p.getType1Price());
         System.out.printf("  Type2: %s (%d units) - $%.2f\n", p.getType2(), p.getType2Units(), p.getType2Price());
@@ -97,7 +97,7 @@ public class ApplicantApp {
         System.out.println("  Manager: " + p.getManagerName());
     }
 
-    private static void applyForProject(Applicant applicant, Scanner scanner) {
+    protected static void applyForProject(Applicant applicant, Scanner scanner) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
         System.out.print("Enter the name of the project you wish to apply for: ");
         String projectName = scanner.nextLine();
@@ -114,7 +114,7 @@ public class ApplicantApp {
         System.out.println("You have successfully applied for: " + projectName);
     }
 
-    private static void viewApplicationStatus(Applicant applicant) {
+    protected static void viewApplicationStatus(Applicant applicant) {
         Project project = applicant.getAppliedProject();
         if (project == null) {
             System.out.println("You have not applied for any project yet.");
@@ -129,7 +129,7 @@ public class ApplicantApp {
         System.out.println("Status: " + status);
     }
 
-    private static void withdrawApplication(Applicant applicant, Scanner scanner) {
+    protected static void withdrawApplication(Applicant applicant, Scanner scanner) {
         Project project = applicant.getAppliedProject();
         if (project == null) {
             System.out.println("No application found to withdraw.");
@@ -139,7 +139,7 @@ public class ApplicantApp {
         System.out.println("Withdraw message has been sent successfully.");
     }
 
-    private static void submitProjectInquiry(Applicant applicant, Scanner scanner) {
+    protected static void submitProjectInquiry(Applicant applicant, Scanner scanner) {
         System.out.print("Enter project name for inquiry: ");
         String projectName = scanner.nextLine();
         Project project = Initialization.getInstance().getProjectList().getProject(projectName);
@@ -160,7 +160,7 @@ public class ApplicantApp {
         }
     }
 
-    private static void viewProjectInquiries(Applicant applicant) {
+    protected static void viewProjectInquiries(Applicant applicant) {
         HashMap<Project, ArrayList<String>> enquiries = Enquiry.getEnquiryByApplicant(applicant);
 
         if (enquiries == null || enquiries.isEmpty()) {
@@ -178,7 +178,7 @@ public class ApplicantApp {
         }
     }
 
-    private static void editProjectInquiry(Applicant applicant, Scanner scanner) {
+    protected static void editProjectInquiry(Applicant applicant, Scanner scanner) {
         viewProjectInquiries(applicant);
         HashMap<Project, ArrayList<String>> enquiries = Enquiry.getEnquiryByApplicant(applicant);
 
@@ -215,7 +215,7 @@ public class ApplicantApp {
         }
     }
 
-    private static void deleteProjectInquiry(Applicant applicant, Scanner scanner) {
+    protected static void deleteProjectInquiry(Applicant applicant, Scanner scanner) {
         viewProjectInquiries(applicant);
         HashMap<Project, ArrayList<String>> enquiries = Enquiry.getEnquiryByApplicant(applicant);
 

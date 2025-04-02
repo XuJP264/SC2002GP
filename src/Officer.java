@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 // Officer 继承 UserCard，并实现 ProjectInCharge 接口
-class Officer extends UserCard implements ProjectInCharge {
+class Officer extends Applicant implements ProjectInCharge {
     private String identity;
     private List<Project> projectsHaveApplied = new ArrayList<>();
     private List<Project> projectsInCharge = new ArrayList<>();
@@ -10,31 +10,6 @@ class Officer extends UserCard implements ProjectInCharge {
         super(name, age, NRIC, marital_status, password);
         this.identity = "Officer";
     }
-
-    public String getName() {
-        return super.getName();
-    }
-
-    public int getAge() {
-        return super.getAge();
-    }
-
-    public String getNRIC() {
-        return super.getNRIC();
-    }
-
-    public String getMaritalStatus() {
-        return super.getMaritalStatus();
-    }
-
-    public String getPassword() {
-        return super.getPassword();
-    }
-
-    public void setPassword(String password) {
-        super.setPassword(password);
-    }
-
     public void addProjectHaveApplied(Project project) {
         projectsHaveApplied.add(project);
     }
@@ -46,11 +21,6 @@ class Officer extends UserCard implements ProjectInCharge {
     public List<Project> getProjectsHaveApplied() {
         return new ArrayList<>(projectsHaveApplied);
     }
-
-    public String getIdentity() {
-        return identity;
-    }
-
     // 实现 ProjectInCharge 接口的方法
     @Override
     public void addProjectInCharge(Project project) {

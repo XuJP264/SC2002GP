@@ -6,251 +6,181 @@ import java.util.List;
 public class OfficerApp extends ApplicantApp {
     public static void main(Officer officer) {
         Scanner scanner = new Scanner(System.in);
-
         System.out.println("Welcome to HDB Officer Portal");
         System.out.println("Logged in as: " + officer.getName() + " (" + officer.getNRIC() + ")");
-        offierInitiate(officer);
+
+        officerInitiate(officer);
+
         while (true) {
             displayMainMenu();
-
             int choice = getValidChoice(scanner, 0, 16);
 
             if (choice == 0) {
                 System.out.println("Logging out... Goodbye!");
                 return;
             }
-            processUserChoice(officer, choice);
+
+            processUserChoice(officer, scanner, choice);
         }
     }
-    private static void offierInitiate(Officer officer) {
-        // check the initialized project list
+
+    private static void officerInitiate(Officer officer) {
         Initialization initialization = Initialization.getInstance();
         ProjectList projectList = initialization.getProjectList();
-        // check the registration list
-        for (Project p : projectList.getProjects().values()){
+
+        for (Project p : projectList.getProjects().values()) {
             if (containsName(p.getOfficers(), officer.getName())) {
                 officer.addProjectInCharge(p);
-//                System.out.println(p.getProjectName());
             }
         }
-        System.out.println("the Initalization is done");
+        System.out.println("Initialization complete");
     }
-    private static void displayMainMenu() {
-        System.out.println("\n=== MAIN MENU ===");
+
+    protected static void displayMainMenu() {
+        System.out.println("\n=== OFFICER MENU ===");
 
         System.out.println("\n[Applicant Functions]");
-        System.out.println("1. View available projects");
-        System.out.println("2. Apply for a project");
-        System.out.println("3. View my application status");
-        System.out.println("4. Request application withdrawal");
-        System.out.println("5. Submit enquiry");
-        System.out.println("6. View my enquiries");
-        System.out.println("7. Edit enquiry");
-        System.out.println("8. Delete enquiry");
+        System.out.println("1. View Eligible Projects");
+        System.out.println("2. Apply for a Project");
+        System.out.println("3. View Application Status");
+        System.out.println("4. Withdraw Application");
+        System.out.println("5. Submit Project Inquiry");
+        System.out.println("6. View Project Inquiries");
+        System.out.println("7. Edit Project Inquiry");
+        System.out.println("8. Delete Project Inquiry");
 
         System.out.println("\n[Officer Functions]");
-        System.out.println("9. Register to manage a project");
-        System.out.println("10. View registration status");
-        System.out.println("11. View managed project details");
-        System.out.println("12. Process withdrawal requests");
-        System.out.println("13. Assist applicant in booking");
-        System.out.println("14. View all applications");
-        System.out.println("15. Generate booking receipt");
-        System.out.println("16. View and reply to enquiries");
-        System.out.println("\n0. Logout");
+        System.out.println("9. Register to Manage Project");
+        System.out.println("10. View Registration Status");
+        System.out.println("11. View Managed Project Details");
+        System.out.println("12. Process Withdrawal Requests");
+        System.out.println("13. Assist Applicant Booking");
+        System.out.println("14. View All Applications");
+        System.out.println("15. Generate Booking Receipt");
+        System.out.println("16. View and Reply to Enquiries");
+        System.out.println("0. Logout");
     }
 
-    private static int getValidChoice(Scanner scanner, int min, int max) {
-        while (true) {
-            System.out.print("Enter your choice (" + min + "-" + max + "): ");
-            String input = scanner.nextLine();
-
-            try {
-                int choice = Integer.parseInt(input);
-                if (choice >= min && choice <= max) {
-                    return choice;
-                } else {
-                    System.out.println("Please enter a number between " + min + " and " + max + ".");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a valid number.");
-            }
-        }
-    }
-
-    private static void processUserChoice(Officer officer, int choice) {
+    protected static void processUserChoice(Officer officer, Scanner scanner, int choice) {
         switch (choice) {
-            case 1:
-                viewAvailableProjects(officer);
-                break;
-            case 2:
-                applyForProject(officer);
-                break;
-            case 3:
-                viewApplicationStatus(officer);
-                break;
-            case 4:
-                requestWithdrawal(officer);
-                break;
-            case 5:
-                submitEnquiry(officer);
-                break;
-            case 6:
-                viewEnquiries(officer);
-                break;
-            case 7:
-                editEnquiry(officer);
-                break;
-            case 8:
-                deleteEnquiry(officer);
-                break;
-            case 9:
-                registerForProject(officer);
-                break;
-            case 10:
-                viewRegistrationStatus(officer);
-                break;
-            case 11:
-                viewManagedProjectDetails(officer);
-                break;
-            case 12:
-                processWithdrawalRequests(officer);
-                break;
-            case 13:
-                assistFlatBooking(officer);
-                break;
-            case 14:
-                viewAllApplications(officer);
-                break;
-            case 15:
-                generateBookingReceipt(officer);
-                break;
-            case 16:
-                viewAndReplyEnquiries(officer);
-                break;
-            default:
-                System.out.println("Invalid choice. Please try again.");
+            case 1 -> viewEligibleProjects(officer);
+            case 2 -> applyForProject(officer, scanner);
+            case 3 -> viewApplicationStatus(officer);
+            case 4 -> withdrawApplication(officer, scanner);
+            case 5 -> submitProjectInquiry(officer, scanner);
+            case 6 -> viewProjectInquiries(officer);
+            case 7 -> editProjectInquiry(officer, scanner);
+            case 8 -> deleteProjectInquiry(officer, scanner);
+            case 9 -> registerForProject(officer, scanner);
+            case 10 -> viewRegistrationStatus(officer);
+            case 11 -> viewManagedProjectDetails(officer);
+            case 12 -> processWithdrawalRequests(officer, scanner);
+            case 13 -> assistFlatBooking(officer, scanner);
+            case 14 -> viewAllApplications(officer, scanner);
+            case 15 -> generateBookingReceipt(officer, scanner);
+            case 16 -> viewAndReplyEnquiries(officer, scanner);
         }
     }
-
-
-    // Inherited from ApplicantApp
-    private static void viewAvailableProjects(Officer officer) {}
-    private static void applyForProject(Officer officer) {}
-    private static void viewApplicationStatus(Officer officer) {}
-    private static void requestWithdrawal(Officer officer) {}
-    private static void submitEnquiry(Officer officer) {}
-    private static void viewEnquiries(Officer officer) {}
-    private static void editEnquiry(Officer officer) {}
-    private static void deleteEnquiry(Officer officer) {}
 
     // Officer-specific methods
-    private static void registerForProject(Officer officer) {
-        //show the list of available projects and let the officer choose one
-        Scanner scanner = new Scanner(System.in);
+    protected static void registerForProject(Officer officer, Scanner scanner) {
         Initialization initialization = Initialization.getInstance();
         ProjectList projects = initialization.getProjectList();
+
+        System.out.println("\n=== Available Projects ===");
         projects.showProjectList();
-        System.out.print("Enter the name of the project you want to register for: ");
+
+        System.out.print("Enter project name to register: ");
         String projectName = scanner.nextLine();
         Project project = projects.getProject(projectName);
-        if(project == null) {
-            System.out.println("Invalid project name. Please try again.");
+
+        if (project == null) {
+            System.out.println("Invalid project name");
             return;
         }
-        //check if the project has been applied by you before or after
-        if(officer.getProjectsHaveApplied().contains(project)){
-            System.out.println("You have already applied for this project.");
+
+        if (officer.getProjectsHaveApplied().contains(project)) {
+            System.out.println("You already applied for this project");
             return;
         }
-        //check if the project has already been registered by you
-        ArrayList<String> officersName = project.getOfficers();
-        if(containsName(officersName, officer.getName())) {
-            System.out.println("You are already registered for this project.");
+
+        if (containsName(project.getOfficers(), officer.getName())) {
+            System.out.println("You're already registered for this project");
             return;
         }
-        //check if the period is overlapped with any other projects
-        String openingDate,closingDate;
-        openingDate = project.getOpeningDate();
-        closingDate = project.getClosingDate();
-        for (Project p : officer.getProjectsInCharge()){
-            if(DateUtils.isOverlapping(openingDate,closingDate,p.getOpeningDate(),p.getClosingDate())){
-                System.out.println("The period for this project has been overlapped with another project.");
+
+        // Check date overlap
+        for (Project p : officer.getProjectsInCharge()) {
+            if (DateUtils.isOverlapping(
+                    project.getOpeningDate(), project.getClosingDate(),
+                    p.getOpeningDate(), p.getClosingDate())) {
+                System.out.println("Project period overlaps with your existing project: " + p.getProjectName());
                 return;
             }
         }
-        //check if the officer has enough officer slots
-        if(project.getOfficerSlot()-project.getOfficers().size() == 0){
-            System.out.println("You do not have any officer slots left.");
-            return;
-        }
-        //send the registration request to the project manager
-        RegistrationList.addRegistration(officer,project);
-        System.out.println("Registration request sent to the project manager.");
-    }
-    public static void viewRegistrationStatus(Officer officer) {
-        HashMap<Project, Boolean> projects = RegistrationList.getRegistrationCondition(officer);
 
-        if (projects.isEmpty()) {
-            System.out.println("Warning: You have not registered for any projects yet.");
+        if (project.getOfficerSlot() - project.getOfficers().size() <= 0) {
+            System.out.println("No available officer slots");
             return;
         }
 
-        System.out.println("You have registered for the following projects:");
-        projects.forEach((project, isAccepted) ->
-                System.out.printf("- %s : %s\n",
-                        project.getProjectName(),
-                        isAccepted ? "accepted" : "unaccepted"
-                )
-        );
+        RegistrationList.addRegistration(officer, project);
+        System.out.println("Registration request sent to project manager");
     }
-    public static void viewManagedProjectDetails(Officer officer) {
+
+    protected static void viewRegistrationStatus(Officer officer) {
+        HashMap<Project, Boolean> registrations = RegistrationList.getRegistrationCondition(officer);
+
+        if (registrations.isEmpty()) {
+            System.out.println("No registration records found");
+            return;
+        }
+
+        System.out.println("\n=== Registration Status ===");
+        registrations.forEach((project, status) ->
+                System.out.println(project.getProjectName() + ": " +
+                        (status ? "Approved" : "Pending")));
+    }
+
+    protected static void viewManagedProjectDetails(Officer officer) {
         List<Project> projects = officer.getProjectsInCharge();
+
         if (projects.isEmpty()) {
-            System.out.println("Warning: You have not registered for any projects yet.");
+            System.out.println("You're not managing any projects");
             return;
         }
-        for (Project p : projects){
-            System.out.println(p.getProjectName());
+
+        System.out.println("\n=== Managed Projects ===");
+        for (Project p : projects) {
+            System.out.println("\nProject: " + p.getProjectName());
             System.out.println("Neighborhood: " + p.getNeighborhood());
-            System.out.println("Type 1: " + p.getType1() + " - " + p.getType1Units() + " units - " + p.getType1Price() + " per unit");
-            System.out.println("Type 2: " + p.getType2() + " - " + p.getType2Units() + " units - " + p.getType2Price() + " per unit");
-            System.out.println("Opening date: " + p.getOpeningDate());
-            System.out.println("Closing date: " + p.getClosingDate());
-            System.out.println("Officer slot: " + p.getOfficerSlot());
-            System.out.println("Officers: " + p.getOfficers());
-            System.out.println();
+            System.out.println("Type 1: " + p.getType1() + " (" + p.getType1Units() + " units)");
+            System.out.println("Type 2: " + p.getType2() + " (" + p.getType2Units() + " units)");
+            System.out.println("Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
+            System.out.println("Officers: " + p.getOfficers().size() + "/" + p.getOfficerSlot());
         }
     }
-    public static void processWithdrawalRequests(Officer officer) {}
-    public static void assistFlatBooking(Officer officer) {}
-    public static void viewAllApplications(Officer officer) {}
-    public static void generateBookingReceipt(Officer officer) {}
-    public static void viewAndReplyEnquiries(Officer officer) {}
-    public static void modifyPassword(Officer officer) {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            System.out.println("Please enter your new password:");
-            String newPassword = scanner.nextLine();
-            System.out.println("Please confirm your new password:");
-            String confirmPassword = scanner.nextLine();
-            if (newPassword.equals(confirmPassword)) {
-                officer.setPassword(newPassword);
-                System.out.println("Password has been successfully changed!");
-                break;
-            } else {
-                System.out.println("Passwords do not match!");
-                System.out.println("Please try again.");
-                continue;
-            }
-        }
+
+    protected static void processWithdrawalRequests(Officer officer, Scanner scanner) {
+
     }
-    public static boolean containsName(List<String> list, String target) {
-        for (String str : list) {
-            if (str.contains(target)) { // 判断 target 是否是 str 的子串
-                return true;
-            }
-        }
-        return false;
+
+    protected static void assistFlatBooking(Officer officer, Scanner scanner) {
+
+    }
+
+    protected static void viewAllApplications(Officer officer, Scanner scanner) {
+
+    }
+
+    private static void generateBookingReceipt(Officer officer, Scanner scanner) {
+    }
+
+    private static void viewAndReplyEnquiries(Officer officer, Scanner scanner) {
+
+    }
+
+    protected static boolean containsName(List<String> list, String target) {
+        return list.stream().anyMatch(str -> str.contains(target));
     }
 }
