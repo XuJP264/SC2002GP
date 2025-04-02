@@ -3,9 +3,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
-public class ApplicantApp {
-    private static Applications applications = new Applications();
 
+public class ApplicantApp {
     public static void main(Applicant applicant) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the HDB Applicant Portal");
@@ -37,7 +36,6 @@ public class ApplicantApp {
         System.out.println("0. Logout");
     }
 
-    // ... (保留原有的getValidChoice方法)
     private static int getValidChoice(Scanner scanner, int min, int max) {
         while (true) {
             System.out.print("Enter your choice (" + min + "-" + max + "): ");
@@ -48,6 +46,7 @@ public class ApplicantApp {
             System.out.println("Invalid input. Try again.");
         }
     }
+
     private static void processChoice(Applicant applicant, Scanner scanner, int choice) {
         switch (choice) {
             case 1 -> viewEligibleProjects(applicant);
@@ -61,7 +60,6 @@ public class ApplicantApp {
         }
     }
 
-    // ... (保留原有的viewEligibleProjects和isEligible方法)
     private static void viewEligibleProjects(Applicant applicant) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
         boolean hasProjects = false;
@@ -78,6 +76,7 @@ public class ApplicantApp {
             System.out.println("No eligible visible projects found based on your profile.");
         }
     }
+
     private static boolean isEligible(Applicant applicant, Project p) {
         String status = applicant.getMaritalStatus();
         int age = applicant.getAge();
@@ -89,6 +88,7 @@ public class ApplicantApp {
         }
         return false;
     }
+
     private static void displayProjectDetails(Project p) {
         System.out.println("- " + p.getProjectName() + " (" + p.getNeighborhood() + ")");
         System.out.printf("  Type1: %s (%d units) - $%.2f\n", p.getType1(), p.getType1Units(), p.getType1Price());
@@ -96,6 +96,7 @@ public class ApplicantApp {
         System.out.println("  Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
         System.out.println("  Manager: " + p.getManagerName());
     }
+
     private static void applyForProject(Applicant applicant, Scanner scanner) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
         System.out.print("Enter the name of the project you wish to apply for: ");
@@ -107,8 +108,8 @@ public class ApplicantApp {
             return;
         }
 
-        // 使用Applications类管理申请
-        applications.addApplication(applicant, project, "Pending");
+        // Using static Applications class to manage applications
+        Applications.addApplication(applicant, project, "Pending");
         applicant.setAppliedProject(project);
         System.out.println("You have successfully applied for: " + projectName);
     }
@@ -120,7 +121,7 @@ public class ApplicantApp {
             return;
         }
 
-        String status = applications.getApplications()
+        String status = Applications.getApplications()
                 .getOrDefault(applicant, new HashMap<>())
                 .getOrDefault(project, "Status not found");
 
@@ -134,13 +135,10 @@ public class ApplicantApp {
             System.out.println("No application found to withdraw.");
             return;
         }
-
-        applications.removeApplication(applicant, project);
-        applicant.setAppliedProject(null);
-        System.out.println("Application withdrawn successfully.");
+        WithdrawApplication.addWithdrawal(applicant, project);
+        System.out.println("Withdraw message has been sent successfully.");
     }
 
-    // 项目相关查询方法
     private static void submitProjectInquiry(Applicant applicant, Scanner scanner) {
         System.out.print("Enter project name for inquiry: ");
         String projectName = scanner.nextLine();

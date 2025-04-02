@@ -1,31 +1,41 @@
 import java.util.HashMap;
-public class Applications {
-    private HashMap<Applicant,HashMap<Project,String>> applications = new HashMap<>();
-    public HashMap<Applicant, HashMap<Project, String>> getApplications() {
-        return applications;
+
+public final class Applications {
+    // Make the map static so it belongs to the class
+    private static final HashMap<Applicant, HashMap<Project, String>> APPLICATIONS = new HashMap<>();
+
+    // Private constructor to prevent instantiation
+    private Applications() {}
+
+    public static HashMap<Applicant, HashMap<Project, String>> getApplications() {
+        return APPLICATIONS;
     }
-    public void addApplication(Applicant applicant, Project project, String status) {
-        HashMap<Project, String> projectMap = applications.get(applicant);
+
+    public static void addApplication(Applicant applicant, Project project, String status) {
+        HashMap<Project, String> projectMap = APPLICATIONS.get(applicant);
         if (projectMap == null) {
             projectMap = new HashMap<>();
-            applications.put(applicant, projectMap);
+            APPLICATIONS.put(applicant, projectMap);
         }
         projectMap.put(project, status);
     }
-    public void updateApplicationStatus(Applicant applicant, Project project, String status) {
-        HashMap<Project, String> projectMap = applications.get(applicant);
+
+    public static void updateApplicationStatus(Applicant applicant, Project project, String status) {
+        HashMap<Project, String> projectMap = APPLICATIONS.get(applicant);
         if (projectMap != null) {
             projectMap.put(project, status);
         }
     }
-    public void removeApplication(Applicant applicant, Project project) {
-        HashMap<Project, String> projectMap = applications.get(applicant);
+
+    public static void removeApplication(Applicant applicant, Project project) {
+        HashMap<Project, String> projectMap = APPLICATIONS.get(applicant);
         if (projectMap != null) {
             projectMap.remove(project);
         }
     }
-    public void displayApplicationsAndStatus(Applicant applicant) {
-        HashMap<Project, String> projectMap = applications.get(applicant);
+
+    public static void displayApplicationsAndStatus(Applicant applicant) {
+        HashMap<Project, String> projectMap = APPLICATIONS.get(applicant);
         if (projectMap == null || projectMap.isEmpty()) {
             System.out.println("No applications found for this applicant.");
             return;
@@ -37,7 +47,6 @@ public class Applications {
         for (Project project : projectMap.keySet()) {
             String status = projectMap.get(project);
 
-            // 输出项目详细信息
             System.out.println("\nProject Name: " + project.getProjectName());
             System.out.println("Neighborhood: " + project.getNeighborhood());
             System.out.println("Housing Types:");
@@ -52,7 +61,6 @@ public class Applications {
                     project.getClosingDate());
             System.out.println("Project Manager: " + project.getManagerName());
 
-            // 输出申请状态
             System.out.println("Application Status: " + status);
             System.out.println("---------------------------------");
         }
