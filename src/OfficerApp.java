@@ -3,7 +3,7 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OfficerApp extends ApplicantApp implements Inquiry{
+public class OfficerApp extends ApplicantApp{
     public static void main(Officer officer) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to HDB Officer Portal");

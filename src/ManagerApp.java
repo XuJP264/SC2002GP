@@ -239,7 +239,16 @@ public class ManagerApp {
         }
         return myProjects;
     }
-
+    protected static void viewAllProjects() {
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        System.out.println("\n=== All Projects ===");
+        for (Project p : projectList.getAllProjects()) {
+            System.out.println("\nProject: " + p.getProjectName());
+            System.out.println("Manager: " + p.getManagerName());
+            System.out.println("Status: " + (p.isVisible() ? "Visible" : "Hidden"));
+            System.out.println("Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
+        }
+    }
     private static void displayProjectsWithNumbers(ArrayList<Project> projects) {
         for (int i = 0; i < projects.size(); i++) {
             System.out.println((i + 1) + ". " + projects.get(i).getProjectName());
