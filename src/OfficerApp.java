@@ -205,7 +205,7 @@ public class OfficerApp extends ApplicantApp {
         );
     }
     public static void viewManagedProjectDetails(Officer officer) {
-        ArrayList<Project> projects = officer.getProjectsInCharge();
+        List<Project> projects = officer.getProjectsInCharge();
         if (projects.isEmpty()) {
             System.out.println("Warning: You have not registered for any projects yet.");
             return;

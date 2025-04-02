@@ -1,6 +1,6 @@
 import java.util.HashMap;
 public class Applications {
-    private HashMap<Applicant,HashMap<Project,String>> applications = new HashMap<>()
+    private HashMap<Applicant,HashMap<Project,String>> applications = new HashMap<>();
     public HashMap<Applicant, HashMap<Project, String>> getApplications() {
         return applications;
     }

@@ -1,7 +1,10 @@
-import java.util.List;
 import java.util.Scanner;
-
-public class ApplicantApp{
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+public class ApplicantApp {
+    private static Applications applications = new Applications();
 
     public static void main(Applicant applicant) {
         Scanner scanner = new Scanner(System.in);
@@ -20,20 +23,21 @@ public class ApplicantApp{
             processChoice(applicant, scanner, choice);
         }
     }
-    
+
     private static void displayMainMenu() {
         System.out.println("\n=== APPLICANT MENU ===");
         System.out.println("1. View Eligible Projects");
         System.out.println("2. Apply for a Project");
         System.out.println("3. View Application Status");
         System.out.println("4. Withdraw Application");
-        System.out.println("5. Submit Inquiry");
-        System.out.println("6. View Inquiries");
-        System.out.println("7. Edit Inquiry");
-        System.out.println("8. Delete Inquiry");
+        System.out.println("5. Submit Project Inquiry");
+        System.out.println("6. View Project Inquiries");
+        System.out.println("7. Edit Project Inquiry");
+        System.out.println("8. Delete Project Inquiry");
         System.out.println("0. Logout");
     }
 
+    // ... (保留原有的getValidChoice方法)
     private static int getValidChoice(Scanner scanner, int min, int max) {
         while (true) {
             System.out.print("Enter your choice (" + min + "-" + max + "): ");
@@ -44,20 +48,20 @@ public class ApplicantApp{
             System.out.println("Invalid input. Try again.");
         }
     }
-
     private static void processChoice(Applicant applicant, Scanner scanner, int choice) {
         switch (choice) {
             case 1 -> viewEligibleProjects(applicant);
             case 2 -> applyForProject(applicant, scanner);
             case 3 -> viewApplicationStatus(applicant);
-            case 4 -> withdrawApplication(applicant);
-            case 5 -> submitInquiry(applicant, scanner);
-            case 6 -> viewInquiries(applicant);
-            case 7 -> editInquiry(applicant, scanner);
-            case 8 -> deleteInquiry(applicant, scanner);
+            case 4 -> withdrawApplication(applicant, scanner);
+            case 5 -> submitProjectInquiry(applicant, scanner);
+            case 6 -> viewProjectInquiries(applicant);
+            case 7 -> editProjectInquiry(applicant, scanner);
+            case 8 -> deleteProjectInquiry(applicant, scanner);
         }
     }
 
+    // ... (保留原有的viewEligibleProjects和isEligible方法)
     private static void viewEligibleProjects(Applicant applicant) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
         boolean hasProjects = false;
@@ -74,7 +78,6 @@ public class ApplicantApp{
             System.out.println("No eligible visible projects found based on your profile.");
         }
     }
-
     private static boolean isEligible(Applicant applicant, Project p) {
         String status = applicant.getMaritalStatus();
         int age = applicant.getAge();
@@ -86,7 +89,6 @@ public class ApplicantApp{
         }
         return false;
     }
-
     private static void displayProjectDetails(Project p) {
         System.out.println("- " + p.getProjectName() + " (" + p.getNeighborhood() + ")");
         System.out.printf("  Type1: %s (%d units) - $%.2f\n", p.getType1(), p.getType1Units(), p.getType1Price());
@@ -94,13 +96,7 @@ public class ApplicantApp{
         System.out.println("  Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
         System.out.println("  Manager: " + p.getManagerName());
     }
-
     private static void applyForProject(Applicant applicant, Scanner scanner) {
-        if (applicant.getAppliedProject() != null && !applicant.getApplicationStatus().equals("Unsuccessful")) {
-            System.out.println("You already have an active application. Please withdraw first.");
-            return;
-        }
-
         ProjectList projectList = Initialization.getInstance().getProjectList();
         System.out.print("Enter the name of the project you wish to apply for: ");
         String projectName = scanner.nextLine();
@@ -111,71 +107,104 @@ public class ApplicantApp{
             return;
         }
 
-        applicant.setAppliedProject(projectName);
-        applicant.setApplicationStatus("Pending");
+        // 使用Applications类管理申请
+        applications.addApplication(applicant, project, "Pending");
+        applicant.setAppliedProject(project);
         System.out.println("You have successfully applied for: " + projectName);
     }
 
     private static void viewApplicationStatus(Applicant applicant) {
-        String applied = applicant.getAppliedProject();
-        String status = applicant.getApplicationStatus();
-
-        if (applied == null || status.equals("none")) {
+        Project project = applicant.getAppliedProject();
+        if (project == null) {
             System.out.println("You have not applied for any project yet.");
-        } else {
-            System.out.println("Project: " + applied);
-            System.out.println("Status: " + status);
+            return;
         }
+
+        String status = applications.getApplications()
+                .getOrDefault(applicant, new HashMap<>())
+                .getOrDefault(project, "Status not found");
+
+        System.out.println("Project: " + project.getProjectName());
+        System.out.println("Status: " + status);
     }
 
-    private static void withdrawApplication(Applicant applicant) {
-        if (applicant.getAppliedProject() == null) {
+    private static void withdrawApplication(Applicant applicant, Scanner scanner) {
+        Project project = applicant.getAppliedProject();
+        if (project == null) {
             System.out.println("No application found to withdraw.");
             return;
         }
 
+        applications.removeApplication(applicant, project);
         applicant.setAppliedProject(null);
-        applicant.setApplicationStatus("Withdrawn");
         System.out.println("Application withdrawn successfully.");
     }
 
-    private static void submitInquiry(Applicant applicant, Scanner scanner) {
+    // 项目相关查询方法
+    private static void submitProjectInquiry(Applicant applicant, Scanner scanner) {
+        System.out.print("Enter project name for inquiry: ");
+        String projectName = scanner.nextLine();
+        Project project = Initialization.getInstance().getProjectList().getProject(projectName);
+
+        if (project == null) {
+            System.out.println("Project not found.");
+            return;
+        }
+
         System.out.print("Enter your inquiry: ");
         String inquiry = scanner.nextLine();
+
         if (!inquiry.isBlank()) {
-            applicant.getInquiries().add(inquiry);
-            System.out.println("Inquiry submitted.");
+            applicant.addProjectEnquiry(project, inquiry);
+            System.out.println("Inquiry submitted for project: " + projectName);
         } else {
             System.out.println("Inquiry cannot be empty.");
         }
     }
 
-    private static void viewInquiries(Applicant applicant) {
-        List<String> inquiries = applicant.getInquiries();
-        if (inquiries.isEmpty()) {
-            System.out.println("You have no inquiries.");
+    private static void viewProjectInquiries(Applicant applicant) {
+        HashMap<Project, ArrayList<String>> enquiries = Enquiry.getEnquiryByApplicant(applicant);
+
+        if (enquiries == null || enquiries.isEmpty()) {
+            System.out.println("You have no project inquiries.");
             return;
         }
 
-        System.out.println("=== Your Inquiries ===");
-        for (int i = 0; i < inquiries.size(); i++) {
-            System.out.println((i + 1) + ". " + inquiries.get(i));
+        System.out.println("=== Your Project Inquiries ===");
+        for (Map.Entry<Project, ArrayList<String>> entry : enquiries.entrySet()) {
+            System.out.println("\nProject: " + entry.getKey().getProjectName());
+            int i = 1;
+            for (String inquiry : entry.getValue()) {
+                System.out.println(i++ + ". " + inquiry);
+            }
         }
     }
 
-    private static void editInquiry(Applicant applicant, Scanner scanner) {
-        viewInquiries(applicant);
-        List<String> inquiries = applicant.getInquiries();
-        if (inquiries.isEmpty()) return;
+    private static void editProjectInquiry(Applicant applicant, Scanner scanner) {
+        viewProjectInquiries(applicant);
+        HashMap<Project, ArrayList<String>> enquiries = Enquiry.getEnquiryByApplicant(applicant);
 
-        System.out.print("Enter the inquiry number to edit: ");
+        if (enquiries == null || enquiries.isEmpty()) return;
+
+        System.out.print("Enter project name to edit inquiry: ");
+        String projectName = scanner.nextLine();
+        Project project = Initialization.getInstance().getProjectList().getProject(projectName);
+
+        if (project == null || !enquiries.containsKey(project)) {
+            System.out.println("Invalid project or no inquiries found.");
+            return;
+        }
+
+        List<String> projectInquiries = enquiries.get(project);
+        System.out.print("Enter inquiry number to edit: ");
         try {
             int index = Integer.parseInt(scanner.nextLine()) - 1;
-            if (index >= 0 && index < inquiries.size()) {
+            if (index >= 0 && index < projectInquiries.size()) {
                 System.out.print("Enter new inquiry: ");
                 String newInquiry = scanner.nextLine();
                 if (!newInquiry.isBlank()) {
-                    inquiries.set(index, newInquiry);
+                    Enquiry.upDateApplicantEnquiry(applicant, project,
+                            projectInquiries.get(index), newInquiry);
                     System.out.println("Inquiry updated.");
                 } else {
                     System.out.println("New inquiry cannot be empty.");
@@ -188,17 +217,28 @@ public class ApplicantApp{
         }
     }
 
-    private static void deleteInquiry(Applicant applicant, Scanner scanner) {
-        viewInquiries(applicant);
-        List<String> inquiries = applicant.getInquiries();
-        if (inquiries.isEmpty()) return;
+    private static void deleteProjectInquiry(Applicant applicant, Scanner scanner) {
+        viewProjectInquiries(applicant);
+        HashMap<Project, ArrayList<String>> enquiries = Enquiry.getEnquiryByApplicant(applicant);
 
-        System.out.print("Enter the inquiry number to delete: ");
+        if (enquiries == null || enquiries.isEmpty()) return;
+
+        System.out.print("Enter project name to edit inquiry: ");
+        String projectName = scanner.nextLine();
+        Project project = Initialization.getInstance().getProjectList().getProject(projectName);
+
+        if (project == null || !enquiries.containsKey(project)) {
+            System.out.println("Invalid project or no inquiries found.");
+            return;
+        }
+
+        List<String> projectInquiries = enquiries.get(project);
+        System.out.print("Enter inquiry number to edit: ");
         try {
             int index = Integer.parseInt(scanner.nextLine()) - 1;
-            if (index >= 0 && index < inquiries.size()) {
-                inquiries.remove(index);
-                System.out.println("Inquiry deleted.");
+            if (index >= 0 && index < projectInquiries.size()) {
+                Enquiry.removeApplicantEnquiry(applicant, project, projectInquiries.get(index));
+                System.out.println("Inquiry removed.");
             } else {
                 System.out.println("Invalid inquiry number.");
             }
@@ -207,10 +247,3 @@ public class ApplicantApp{
         }
     }
 }
-
-
-        
-
-        
-
-        

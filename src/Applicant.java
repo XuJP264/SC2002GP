@@ -1,58 +1,54 @@
 import java.util.ArrayList;
 import java.util.List;
-
-class Applicant extends UserCard {
+import java.util.HashMap;
+public class Applicant extends UserCard {
     private String identity;
-    private String appliedProject;
+    private List<String> personalInquiries; // 个人直接提出的问题
+    private Project appliedProject; // 改为直接存储Project对象而非名称
     private String applicationStatus;
-    private List<String> inquiries;
 
     public Applicant(String name, int age, String NRIC, String marital_status, String password) {
         super(name, age, NRIC, marital_status, password);
         this.identity = "Applicant";
         this.appliedProject = null;
-        this.applicationStatus = "none";  // Changed from none (undefined) to "none" (string)
-        this.inquiries = new ArrayList<>();  // Corrected initialization
+        this.applicationStatus = "None";
+        this.personalInquiries = new ArrayList<>();
     }
-    public String getName() {
-        return super.getName();
-    }
-    public int getAge() {
-        return super.getAge();
-    }
-    public String getNRIC() {
-        return super.getNRIC();
-    }
-    public String getMaritalStatus() {
-        return super.getMaritalStatus();
-    }
-    public String getPassword() {
-        return super.getPassword();
-    }
-    public void setPassword(String password) {
-        super.setPassword(password);
-    }
-    public String getIdentity() {
-        return identity;
-    }
-    public String getAppliedProject() {
+
+    // 移除冗余的getter/setter（继承自UserCard的无需重复定义）
+
+    // 新增或修改的方法
+    public Project getAppliedProject() {
         return appliedProject;
+    }
+
+    public void setAppliedProject(Project project) {
+        this.appliedProject = project;
     }
 
     public String getApplicationStatus() {
         return applicationStatus;
     }
 
-    public List<String> getInquiries() {
-        return inquiries;
-    }
-
-    public void setAppliedProject(String appliedProject) {
-        this.appliedProject = appliedProject;
-    }
     public void setApplicationStatus(String status) {
         this.applicationStatus = status;
     }
-    
-}
 
+    public String getIdentity() {
+        return identity;
+    }
+
+    public List<String> getPersonalInquiries() {
+        return personalInquiries;
+    }
+
+    // 添加项目相关查询的方法
+    public void addProjectEnquiry(Project project, String message) {
+        Enquiry.addApplicantEnquiry(this, project, message);
+    }
+
+    public List<String> getProjectEnquiries(Project project) {
+        HashMap<Project, ArrayList<String>> enquiries = Enquiry.getEnquiryByApplicant(this);
+        return enquiries != null ? enquiries.getOrDefault(project, new ArrayList<>()) : new ArrayList<>();
+    }
+}

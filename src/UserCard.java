@@ -1,4 +1,4 @@
-public class UserCard {
+abstract public class UserCard {
     private String name;
     private int age;
     private String NRIC;
