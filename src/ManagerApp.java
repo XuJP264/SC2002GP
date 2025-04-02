@@ -3,370 +3,370 @@ import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class ManagerApp { 
+public class ManagerApp {
     public static void main(Manager manager) {
         Scanner scanner = new Scanner(System.in);
-        int choice;
+        System.out.println("Welcome to HDB Manager Portal");
+        System.out.println("Logged in as: " + manager.getName());
 
-        System.out.println("Welcome to Manager App");
-        do {
-            System.out.println("\nPlease select an option:");
-            System.out.println("1. Create new BTO project");
-            System.out.println("2. Edit existing BTO project");
-            System.out.println("3. Delete BTO project");
-            System.out.println("4. Toggle project visibility");
-            System.out.println("5. View all projects");
-            System.out.println("6. View my projects");
-            System.out.println("7. View pending HDB Officer registrations");
-            System.out.println("8. Approve/Reject HDB Officer registration");
-            System.out.println("9. Approve/Reject Applicant's BTO application");
-            System.out.println("10. Approve/Reject application withdrawal");
-            System.out.println("11. Generate applicants report");
-            System.out.println("12. View all enquiries");
-            System.out.println("13. View and reply to project enquiries");
-            System.out.println("14. Modify Manager password");
-            System.out.println("0. Exit");
-            System.out.print("Enter your choice: ");
+        while (true) {
+            displayMainMenu();
+            int choice = getValidChoice(scanner, 0, 14);
 
-            try {
-                choice = Integer.parseInt(scanner.nextLine());
-
-                switch (choice) {
-                    case 1:
-                        createNewBTOProject(manager);
-                        break;
-                    case 2:
-                        editBTOProject(manager);
-                        break;
-                    case 3:
-                        deleteBTOProject(manager);
-                        break;
-                    case 4:
-                        toggleProjectVisibility(manager);
-                        break;
-                    case 5:
-                        viewAllProjects();
-                        break;
-                    case 6:
-                        viewMyProjects();
-                        break;
-                    case 7:
-                        viewPendingOfficerRegistrations();
-                        break;
-                    case 8:
-                        processOfficerRegistration();
-                        break;
-                    case 9:
-                        processBTOApplication();
-                        break;
-                    case 10:
-                        processWithdrawalRequest();
-                        break;
-                    case 11:
-                        generateApplicantsReport();
-                        break;
-                    case 12:
-                        viewAllEnquiries();
-                        break;
-                    case 13:
-                        viewAndReplyEnquiries();
-                        break;
-                    case 14:
-                        modifyManagerPassword(manager);
-                        break;
-                    case 0:
-                        System.out.println("Exiting Manager App. Goodbye!");
-                        break;
-                    default:
-                        System.out.println("Invalid choice. Please enter a number between 0 and 13.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-                choice = -1; // Ensure loop continues
+            if (choice == 0) {
+                System.out.println("Logging out... Goodbye!");
+                return;
             }
 
-        } while (choice != 0);
+            processUserChoice(manager, scanner, choice);
+        }
     }
 
-    // implementation of methods 
-    private static void createNewBTOProject(Manager manager) {
-        Scanner scanner = new Scanner(System.in);
-        Initialization init = Initialization.getInstance(); //// singleton instance of the initialization adds the project
-        ProjectList projectList = init.getProjectList(); 
-        
-        System.out.println("=== Create New BTO Project ==="); //prompting project details
+    protected static void displayMainMenu() {
+        System.out.println("\n=== MANAGER MENU ===");
+        System.out.println("1. Create new BTO project");
+        System.out.println("2. Edit existing BTO project");
+        System.out.println("3. Delete BTO project");
+        System.out.println("4. Toggle project visibility");
+        System.out.println("5. View all projects");
+        System.out.println("6. View my projects");
+        System.out.println("7. View pending officer registrations");
+        System.out.println("8. Process officer registrations");
+        System.out.println("9. Process BTO applications");
+        System.out.println("10. Process withdrawal requests");
+        System.out.println("11. Generate applicants report");
+        System.out.println("12. View all enquiries");
+        System.out.println("13. View and reply to enquiries");
+        System.out.println("14. Modify password");
+        System.out.println("0. Logout");
+    }
+
+    protected static void processUserChoice(Manager manager, Scanner scanner, int choice) {
+        switch (choice) {
+            case 1 -> createNewBTOProject(manager, scanner);
+            case 2 -> editBTOProject(manager, scanner);
+            case 3 -> deleteBTOProject(manager, scanner);
+            case 4 -> toggleProjectVisibility(manager, scanner);
+            case 5 -> viewAllProjects();
+            case 6 -> viewMyProjects(manager);
+            case 7 -> viewPendingOfficerRegistrations();
+            case 8 -> processOfficerRegistration(scanner);
+            case 9 -> processBTOApplication(manager, scanner);
+            case 10 -> processWithdrawalRequest(scanner);
+            case 11 -> generateApplicantsReport();
+            case 12 -> viewAllEnquiries();
+            case 13 -> viewAndReplyEnquiries(scanner);
+            case 14 -> modifyManagerPassword(manager, scanner);
+        }
+    }
+
+    private static int getValidChoice(Scanner scanner, int min, int max) {
+        while (true) {
+            System.out.print("Enter your choice: ");
+            try {
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice >= min && choice <= max) {
+                    return choice;
+                }
+                System.out.println("Invalid choice. Please enter a number between " + min + " and " + max + ".");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+
+    protected static void createNewBTOProject(Manager manager, Scanner scanner) {
+        Initialization init = Initialization.getInstance();
+        ProjectList projectList = init.getProjectList();
+
+        System.out.println("\n=== Create New BTO Project ===");
         System.out.print("Enter Project Name: ");
         String projectName = scanner.nextLine().trim();
+
+        if (projectList.getProject(projectName) != null) {
+            System.out.println("Project with this name already exists!");
+            return;
+        }
+
         System.out.print("Enter Neighbourhood: ");
         String neighbourhood = scanner.nextLine().trim();
-        
-        //flat type 1
+
+        // Flat type 1 details
         System.out.print("Enter Flat Type 1 (e.g., 2-Room): ");
         String type1 = scanner.nextLine().trim();
-        System.out.print("Enter number of units for " + type1 + ": ");
-        int type1Units = Integer.parseInt(scanner.nextLine().trim());
-        System.out.print("Enter price for " + type1 + ": ");
-        double type1Price = Double.parseDouble(scanner.nextLine().trim());
-        
-        //flat type 2
+        int type1Units = getValidIntInput(scanner, "Enter number of units for " + type1 + ": ");
+        double type1Price = getValidDoubleInput(scanner, "Enter price for " + type1 + ": ");
+
+        // Flat type 2 details
         System.out.print("Enter Flat Type 2 (e.g., 3-Room): ");
         String type2 = scanner.nextLine().trim();
-        System.out.print("Enter number of units for " + type2 + ": ");
-        int type2Units = Integer.parseInt(scanner.nextLine().trim());
-        System.out.print("Enter price for " + type2 + ": ");
-        double type2Price = Double.parseDouble(scanner.nextLine().trim());
-        
-        //application window dates
-        System.out.print("Enter Application Opening Date (yyyy-mm-dd): ");
-        String openingDate = scanner.nextLine().trim();
-        System.out.print("Enter Application Closing Date (yyyy-mm-dd): ");
-        String closingDate = scanner.nextLine().trim();
-        
-        /*
-        //validation for the dates, i coudlnt get it working so im just gonna fix this when i can haha
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d"); 
-        LocalDate openDate, closeDate;
-        try {
-        	openDate = LocalDate.parse(openingDate, formatter);
-        	closeDate = LocalDate.parse(closingDate,formatter);
-        	if (closeDate.isBefore(openDate)) {
-               System.out.println("Closing date cannot be before opening date.");
-                return;}
-        }catch (Exception e) {
-        	System.out.println("Invalid date format. Please use yyyy/M/d instead.");
-        	return;} */
-        
-        // implementation of code to check for active projects for this specific manager, to-be-implemented
-        boolean overlapExists = false;
-        for (Project p : projectList.getAllProjects()) {
-            if (p.getManagerName().equals(manager.getName())) {
-                if (DateUtils.isOverlapping(p.getOpeningDate(), p.getClosingDate(), openingDate, closingDate)) {
-                    overlapExists = true;
-                    break;}}}
-        if (overlapExists) {
-            System.out.println("You already have an active project with an overlapping application window. Cannot create another.");
-            return;}
-        
-        // for simplicity's sake i'm setting a default officer slot and list 
-        int officerSlot = 10;
-        ArrayList<String> officers = new ArrayList<>();
-        
-        
-        Project newProject = new Project(
-                projectName, neighbourhood, 
-                type1, type1Units, 
-                type1Price, type2, 
-                type2Units, type2Price, 
-                openingDate, closingDate, 
-                manager.getName(), officerSlot, officers);
+        int type2Units = getValidIntInput(scanner, "Enter number of units for " + type2 + ": ");
+        double type2Price = getValidDoubleInput(scanner, "Enter price for " + type2 + ": ");
 
-        init.getProjectList().addProject(newProject);
-        
+        // Date handling
+        LocalDate openingDate = getValidDateInput(scanner, "Enter Application Opening Date (yyyy-mm-dd): ");
+        LocalDate closingDate = getValidDateInput(scanner, "Enter Application Closing Date (yyyy-mm-dd): ");
+
+        if (closingDate.isBefore(openingDate)) {
+            System.out.println("Closing date cannot be before opening date.");
+            return;
+        }
+
+        // Check for overlapping projects
+        if (hasOverlappingProjects(manager, projectList, openingDate, closingDate)) {
+            System.out.println("You already have an active project with overlapping dates.");
+            return;
+        }
+
+        // Create and add project
+        Project newProject = new Project(
+                projectName, neighbourhood,
+                type1, type1Units, type1Price,
+                type2, type2Units, type2Price,
+                openingDate.toString(), closingDate.toString(),
+                manager.getName(), 10, new ArrayList<>());
+
+        projectList.addProject(newProject);
         System.out.println("Project \"" + projectName + "\" created successfully.");
     }
 
-    //edit projects
-    private static void editBTOProject(Manager manager) {
-        Scanner scanner = new Scanner(System.in);
+    protected static void editBTOProject(Manager manager, Scanner scanner) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
-        ArrayList<Project> myProjects = new ArrayList<>();
-        for (Project p : projectList.getAllProjects()) {
-            if (p.getManagerName().equals(manager.getName())) {
-                myProjects.add(p);}
-        }
+        ArrayList<Project> myProjects = getManagerProjects(manager, projectList);
+
         if (myProjects.isEmpty()) {
             System.out.println("You don't have any projects to edit.");
-            return;}
-        System.out.println("Your Projects:");
-        for (int i = 0; i < myProjects.size(); i++) {
-            System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName());
-            }
-        System.out.print("Enter the number of the project you want to edit: ");
-        int choice = Integer.parseInt(scanner.nextLine());
-        if (choice < 1 || choice > myProjects.size()) {
-            System.out.println("Invalid selection.");
             return;
-}
+        }
+
+        System.out.println("\nYour Projects:");
+        displayProjectsWithNumbers(myProjects);
+
+        int choice = getValidChoice(scanner, 1, myProjects.size(), "Enter the number of the project to edit: ");
         Project project = myProjects.get(choice - 1);
-        
-        System.out.println("Editing Project: " + project.getProjectName());
-        System.out.println("Select the field to edit:");
+
+        System.out.println("\nEditing Project: " + project.getProjectName());
+        System.out.println("Select field to edit:");
         System.out.println("1. Type 1 Units");
         System.out.println("2. Type 2 Units");
         System.out.println("3. Type 1 Price");
         System.out.println("4. Type 2 Price");
         System.out.println("5. Application Dates");
-        System.out.print("Enter your choice (1-5): ");
-        int fieldChoice = Integer.parseInt(scanner.nextLine());
-        
+
+        int fieldChoice = getValidChoice(scanner, 1, 5);
+
         switch(fieldChoice) {
-            case 1:
-                System.out.println("Current Type 1 Units: " + project.getType1Units());
-                System.out.print("Enter new Type 1 Units: ");
-                int newUnits1 = Integer.parseInt(scanner.nextLine());
-                project.setType1Units(newUnits1);
-                break;
-            case 2:
-                System.out.println("Current Type 2 Units: " + project.getType2Units());
-                System.out.print("Enter new Type 2 Units: ");
-                int newUnits2 = Integer.parseInt(scanner.nextLine());
-                project.setType2Units(newUnits2);
-                break;
-            case 3:
-                System.out.println("Current Type 1 Price: " + project.getType1Price());
-                System.out.print("Enter new Type 1 Price: ");
-                double newPrice1 = Double.parseDouble(scanner.nextLine());
-                project.setType1Price(newPrice1);
-                break;
-            case 4:
-                System.out.println("Current Type 2 Price: " + project.getType2Price());
-                System.out.print("Enter new Type 2 Price: ");
-                double newPrice2 = Double.parseDouble(scanner.nextLine());
-                project.setType2Price(newPrice2);
-                break;
-            case 5:
-                System.out.println("Current Opening Date: " + project.getOpeningDate());
-                System.out.println("Current Closing Date: " + project.getClosingDate());
-                System.out.print("Enter new Opening Date (yyyy/M/d): ");
-                String newOpeningDate = scanner.nextLine().trim();
-                System.out.print("Enter new Closing Date (yyyy/M/d): ");
-                String newClosingDate = scanner.nextLine().trim();
-                
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/M/d");
-                LocalDate newOpenDate, newCloseDate;
-                try {
-                    newOpenDate = LocalDate.parse(newOpeningDate, formatter);
-                    newCloseDate = LocalDate.parse(newClosingDate, formatter);
-                    if (newCloseDate.isBefore(newOpenDate)) {
-                        System.out.println("Closing date cannot be before opening date.");
-                        return;
-                    }
-                } catch(Exception e) {
-                    System.out.println("Invalid date format. Use yyyy/M/d.");
+            case 1 -> {
+                int newUnits = getValidIntInput(scanner, "Current Type 1 Units: " + project.getType1Units() + "\nEnter new value: ");
+                project.setType1Units(newUnits);
+            }
+            case 2 -> {
+                int newUnits = getValidIntInput(scanner, "Current Type 2 Units: " + project.getType2Units() + "\nEnter new value: ");
+                project.setType2Units(newUnits);
+            }
+            case 3 -> {
+                double newPrice = getValidDoubleInput(scanner, "Current Type 1 Price: " + project.getType1Price() + "\nEnter new value: ");
+                project.setType1Price(newPrice);
+            }
+            case 4 -> {
+                double newPrice = getValidDoubleInput(scanner, "Current Type 2 Price: " + project.getType2Price() + "\nEnter new value: ");
+                project.setType2Price(newPrice);
+            }
+            case 5 -> {
+                LocalDate newOpen = getValidDateInput(scanner, "Current Opening Date: " + project.getOpeningDate() + "\nEnter new date (yyyy-mm-dd): ");
+                LocalDate newClose = getValidDateInput(scanner, "Current Closing Date: " + project.getClosingDate() + "\nEnter new date (yyyy-mm-dd): ");
+
+                if (newClose.isBefore(newOpen)) {
+                    System.out.println("Closing date cannot be before opening date.");
                     return;
                 }
-                project.setOpeningDate(newOpeningDate);
-                project.setClosingDate(newClosingDate);
-                break;
-            default:
-                System.out.println("Invalid choice.");
-                return;
+                project.setOpeningDate(newOpen.toString());
+                project.setClosingDate(newClose.toString());
+            }
         }
         System.out.println("Project updated successfully.");
     }
 
-    
-    //deletion 
-    private static void deleteBTOProject(Manager manager) { 
-        Scanner scanner = new Scanner(System.in);
-        ProjectList projectList = Initialization.getInstance().getProjectList(); //might turn this into a helper function actually
-        ArrayList<Project> myProjects = new ArrayList<>();
-        for (Project p : projectList.getAllProjects()) {
-            if (p.getManagerName().equals(manager.getName())) {
-                myProjects.add(p);}
-        }
-        
+    protected static void deleteBTOProject(Manager manager, Scanner scanner) {
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        ArrayList<Project> myProjects = getManagerProjects(manager, projectList);
+
         if (myProjects.isEmpty()) {
             System.out.println("You have no projects to delete.");
-            return;}
-        
-        System.out.println("Your Projects:");
-        for (int i = 0; i < myProjects.size(); i++) {
-            System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName());}
-        
-        System.out.println("Enter the number of the project you want to delete:");
-        int choice = Integer.parseInt(scanner.nextLine());
-        if (choice < 1 || choice > myProjects.size()) {
-            System.out.println("Invalid selection.");
-            return;}
-        
-        Project projectToDelete = myProjects.get(choice - 1);
-        projectList.removeProject(projectToDelete.getProjectName()); //actually removes the project from the internal hash :)
-        
-        System.out.println("Project \"" + projectToDelete.getProjectName() + "\" deleted successfully.");
+            return;
+        }
+
+        System.out.println("\nYour Projects:");
+        displayProjectsWithNumbers(myProjects);
+
+        int choice = getValidChoice(scanner, 1, myProjects.size(), "Enter the number of the project to delete: ");
+        Project project = myProjects.get(choice - 1);
+
+        projectList.removeProject(project.getProjectName());
+        System.out.println("Project \"" + project.getProjectName() + "\" deleted successfully.");
     }
 
-
-    private static void toggleProjectVisibility(Manager manager) {
-        Scanner scanner = new Scanner(System.in);
+    protected static void toggleProjectVisibility(Manager manager, Scanner scanner) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
+        ArrayList<Project> myProjects = getManagerProjects(manager, projectList);
+
+        if (myProjects.isEmpty()) {
+            System.out.println("You don't have any projects to toggle.");
+            return;
+        }
+
+        System.out.println("\nYour Projects:");
+        for (int i = 0; i < myProjects.size(); i++) {
+            String status = myProjects.get(i).isVisible() ? "Visible" : "Hidden";
+            System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName() + " - " + status);
+        }
+
+        int choice = getValidChoice(scanner, 1, myProjects.size(), "Enter the number of the project to toggle: ");
+        Project project = myProjects.get(choice - 1);
+
+        project.setVisible(!project.isVisible());
+        System.out.println("Project \"" + project.getProjectName() + "\" is now " +
+                (project.isVisible() ? "Visible" : "Hidden"));
+    }
+
+    // Helper methods
+    private static ArrayList<Project> getManagerProjects(Manager manager, ProjectList projectList) {
         ArrayList<Project> myProjects = new ArrayList<>();
         for (Project p : projectList.getAllProjects()) {
             if (p.getManagerName().equals(manager.getName())) {
-                myProjects.add(p);}}
-        if (myProjects.isEmpty()) {
-            System.out.println("You don't have any projects to toggle.");
-            return;}
-        System.out.println("Your Projects:");
-        for (int i = 0; i < myProjects.size(); i++) {
-            String status = myProjects.get(i).isVisible() ? "Visible" : "Hidden";
-            System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName() + " - " + status);}
-        System.out.print("Enter the number of the project to toggle visibility: ");
-        int choice = Integer.parseInt(scanner.nextLine());
-        if (choice < 1 || choice > myProjects.size()) {
-            System.out.println("Invalid selection.");
-            return;}
-        Project project = myProjects.get(choice - 1);
-        project.setVisible(!project.isVisible());
-        System.out.println("Project \"" + project.getProjectName() + "\" visibility toggled to " +
-                (project.isVisible() ? "Visible" : "Hidden") + ".");}
-
-
-    private static void viewAllProjects() {
-        ProjectList projectList = Initialization.getInstance().getProjectList();
-        // true to show hidden projects too
-        projectList.showProjectList(true);
+                myProjects.add(p);
+            }
+        }
+        return myProjects;
     }
 
-
-    private static void viewMyProjects() {
-        // Implementation here
+    private static void displayProjectsWithNumbers(ArrayList<Project> projects) {
+        for (int i = 0; i < projects.size(); i++) {
+            System.out.println((i + 1) + ". " + projects.get(i).getProjectName());
+        }
     }
 
-    private static void viewPendingOfficerRegistrations() {
-        // Implementation here
-    }
-
-    private static void processOfficerRegistration() {
-        // Implementation here
-    }
-
-    private static void processBTOApplication() {
-        // Implementation here
-    }
-
-    private static void processWithdrawalRequest() {
-        // Implementation here
-    }
-
-    private static void generateApplicantsReport() {
-        // Implementation here
-    }
-
-    private static void viewAllEnquiries() {
-        // Implementation here
-    }
-
-    private static void viewAndReplyEnquiries() {
-        // Implementation here
-    }
-    private static void modifyManagerPassword(Manager manager) {
-        Scanner scanner = new Scanner(System.in);
+    private static int getValidIntInput(Scanner scanner, String prompt) {
         while (true) {
-            System.out.println("Please enter your new password:");
-            String newPassword = scanner.nextLine();
-            System.out.println("Please confirm your new password:");
-            String confirmPassword = scanner.nextLine();
-            if (newPassword.equals(confirmPassword)) {
-                manager.setPassword(newPassword);
-                System.out.println("Password has been successfully changed!");
-                break;
+            System.out.print(prompt);
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a whole number.");
             }
-            else  {
-                System.out.println("Passwords do not match!");
-                System.out.println("Please try again.");
-                continue;
+        }
+    }
+
+    private static double getValidDoubleInput(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return Double.parseDouble(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
             }
+        }
+    }
+
+    private static LocalDate getValidDateInput(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return LocalDate.parse(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please use yyyy-mm-dd.");
+            }
+        }
+    }
+
+    private static int getValidChoice(Scanner scanner, int min, int max, String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                int choice = Integer.parseInt(scanner.nextLine());
+                if (choice >= min && choice <= max) {
+                    return choice;
+                }
+                System.out.println("Please enter a number between " + min + " and " + max + ".");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+
+    private static boolean hasOverlappingProjects(Manager manager, ProjectList projectList,
+                                                  LocalDate newOpen, LocalDate newClose) {
+        for (Project p : projectList.getAllProjects()) {
+            if (p.getManagerName().equals(manager.getName())) {
+                LocalDate existingOpen = LocalDate.parse(p.getOpeningDate());
+                LocalDate existingClose = LocalDate.parse(p.getClosingDate());
+
+                if (newOpen.isBefore(existingClose) && newClose.isAfter(existingOpen)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Placeholder methods for unimplemented functionality
+    protected static void viewMyProjects(Manager manager) {
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        ArrayList<Project> myProjects = getManagerProjects(manager, projectList);
+
+        if (myProjects.isEmpty()) {
+            System.out.println("You don't have any projects.");
+            return;
+        }
+
+        System.out.println("\n=== Your Projects ===");
+        for (Project p : myProjects) {
+            System.out.println("\nProject: " + p.getProjectName());
+            System.out.println("Status: " + (p.isVisible() ? "Visible" : "Hidden"));
+            System.out.println("Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
+            System.out.println("Officers: " + p.getOfficers().size() + "/" + p.getOfficerSlot());
+        }
+    }
+
+    protected static void viewPendingOfficerRegistrations() {
+        System.out.println("\nPending officer registrations functionality coming soon");
+    }
+
+    protected static void processOfficerRegistration(Scanner scanner) {
+        System.out.println("\nProcess officer registrations functionality coming soon");
+    }
+
+    protected static void processBTOApplication(Manager manager, Scanner scanner) {
+        System.out.println("\nProcess BTO applications functionality coming soon");
+    }
+
+    protected static void processWithdrawalRequest(Scanner scanner) {
+        System.out.println("\nProcess withdrawal requests functionality coming soon");
+    }
+
+    protected static void generateApplicantsReport() {
+        System.out.println("\nGenerate applicants report functionality coming soon");
+    }
+
+    protected static void viewAllEnquiries() {
+        System.out.println("\nView all enquiries functionality coming soon");
+    }
+
+    protected static void viewAndReplyEnquiries(Scanner scanner) {
+        System.out.println("\nView and reply to enquiries functionality coming soon");
+    }
+
+    protected static void modifyManagerPassword(Manager manager, Scanner scanner) {
+        System.out.print("\nEnter new password: ");
+        String newPassword = scanner.nextLine();
+        System.out.print("Confirm new password: ");
+        String confirmPassword = scanner.nextLine();
+
+        if (newPassword.equals(confirmPassword)) {
+            manager.setPassword(newPassword);
+            System.out.println("Password updated successfully!");
+        } else {
+            System.out.println("Passwords do not match. Password not changed.");
         }
     }
 }

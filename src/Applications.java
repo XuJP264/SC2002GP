@@ -1,6 +1,6 @@
 import java.util.HashMap;
 
-public final class Applications {
+public class Applications {
     // Make the map static so it belongs to the class
     private static final HashMap<Applicant, HashMap<Project, String>> APPLICATIONS = new HashMap<>();
 
@@ -20,7 +20,7 @@ public final class Applications {
         projectMap.put(project, status);
     }
 
-    public static void updateApplicationStatus(Applicant applicant, Project project, String status) {
+    public static void updateApplicationStatus(Applicant applicant,Project project, String status) {
         HashMap<Project, String> projectMap = APPLICATIONS.get(applicant);
         if (projectMap != null) {
             projectMap.put(project, status);

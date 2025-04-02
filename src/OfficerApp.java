@@ -3,7 +3,7 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OfficerApp extends ApplicantApp {
+public class OfficerApp extends ApplicantApp implements Inquiry{
     public static void main(Officer officer) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to HDB Officer Portal");
@@ -29,7 +29,7 @@ public class OfficerApp extends ApplicantApp {
         ProjectList projectList = initialization.getProjectList();
 
         for (Project p : projectList.getProjects().values()) {
-            if (containsName(p.getOfficers(), officer.getName())) {
+            if (ContainsName.containsName(p.getOfficers(), officer.getName())) {
                 officer.addProjectInCharge(p);
             }
         }
@@ -53,11 +53,11 @@ public class OfficerApp extends ApplicantApp {
         System.out.println("9. Register to Manage Project");
         System.out.println("10. View Registration Status");
         System.out.println("11. View Managed Project Details");
-        System.out.println("12. Process Withdrawal Requests");
-        System.out.println("13. Assist Applicant Booking");
-        System.out.println("14. View All Applications");
-        System.out.println("15. Generate Booking Receipt");
-        System.out.println("16. View and Reply to Enquiries");
+        System.out.println("12. Assist Applicant Booking");
+        System.out.println("13. Generate Booking Receipt");
+        System.out.println("14. View Inquiries");
+        System.out.println("15. Reply to Inquiries");
+        System.out.println("16. Modify Password");
         System.out.println("0. Logout");
     }
 
@@ -74,11 +74,11 @@ public class OfficerApp extends ApplicantApp {
             case 9 -> registerForProject(officer, scanner);
             case 10 -> viewRegistrationStatus(officer);
             case 11 -> viewManagedProjectDetails(officer);
-            case 12 -> processWithdrawalRequests(officer, scanner);
-            case 13 -> assistFlatBooking(officer, scanner);
-            case 14 -> viewAllApplications(officer, scanner);
-            case 15 -> generateBookingReceipt(officer, scanner);
-            case 16 -> viewAndReplyEnquiries(officer, scanner);
+            case 12 -> assistFlatBooking(officer, scanner);
+            case 13 -> generateBookingReceipt(officer, scanner);
+            case 14 -> viewInquiry(officer, scanner);
+            case 15 -> replyInquiry(officer, scanner);
+            case 16 -> modifyPassword(officer, scanner);
         }
     }
 
@@ -104,7 +104,7 @@ public class OfficerApp extends ApplicantApp {
             return;
         }
 
-        if (containsName(project.getOfficers(), officer.getName())) {
+        if (ContainsName.containsName(project.getOfficers(), officer.getName())) {
             System.out.println("You're already registered for this project");
             return;
         }
@@ -129,7 +129,7 @@ public class OfficerApp extends ApplicantApp {
     }
 
     protected static void viewRegistrationStatus(Officer officer) {
-        HashMap<Project, Boolean> registrations = RegistrationList.getRegistrationCondition(officer);
+        HashMap<Project, String> registrations = RegistrationList.getRegistrationConditions(officer);
 
         if (registrations.isEmpty()) {
             System.out.println("No registration records found");
@@ -137,9 +137,9 @@ public class OfficerApp extends ApplicantApp {
         }
 
         System.out.println("\n=== Registration Status ===");
-        registrations.forEach((project, status) ->
-                System.out.println(project.getProjectName() + ": " +
-                        (status ? "Approved" : "Pending")));
+        registrations.forEach((project, condition) ->
+                System.out.println(project.getProjectName() + ": " + (condition != null ? condition : "No condition specified"))
+        );
     }
 
     protected static void viewManagedProjectDetails(Officer officer) {
@@ -160,27 +160,18 @@ public class OfficerApp extends ApplicantApp {
             System.out.println("Officers: " + p.getOfficers().size() + "/" + p.getOfficerSlot());
         }
     }
-
-    protected static void processWithdrawalRequests(Officer officer, Scanner scanner) {
-
-    }
-
     protected static void assistFlatBooking(Officer officer, Scanner scanner) {
-
     }
-
-    protected static void viewAllApplications(Officer officer, Scanner scanner) {
-
-    }
-
     private static void generateBookingReceipt(Officer officer, Scanner scanner) {
     }
-
-    private static void viewAndReplyEnquiries(Officer officer, Scanner scanner) {
-
+    private static void viewInquiry(Officer officer, Scanner scanner) {
     }
-
-    protected static boolean containsName(List<String> list, String target) {
-        return list.stream().anyMatch(str -> str.contains(target));
+    private static void replyInquiry(Officer officer, Scanner scanner) {
+    }
+    private static void modifyPassword(Officer officer, Scanner scanner) {
+        System.out.print("Enter new password: ");
+        String newPassword = scanner.nextLine();
+        officer.setPassword(newPassword);
+        System.out.println("Password updated successfully");
     }
 }

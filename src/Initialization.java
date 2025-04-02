@@ -26,9 +26,9 @@ public class Initialization {
     public void initialize() {
         System.out.println("Initializing...");
         this.applicantInitialize();
-        this.managerInitialize();
-        this.officerInitialize();
         this.projectInitialize();
+        this.officerInitialize();
+        this.managerInitialize();
         System.out.println("Initialization complete.");
     }
 
@@ -47,7 +47,27 @@ public class Initialization {
     public ProjectList getProjectList() {
         return projectList;
     }
-
+    // Helper methods to initialize the data
+    private static void officerProjectInitiate(Officer officer) {
+        Initialization initialization = Initialization.getInstance();
+        ProjectList projectList = initialization.getProjectList();
+        for (Project p : projectList.getProjects().values()) {
+            if (ContainsName.containsName(p.getOfficers(), officer.getName())) {
+                officer.addProjectInCharge(p);
+            }
+        }
+        System.out.println("Officer project initialization complete");
+    }
+    private static void managerProjectInitiate(Manager manager) {
+        Initialization initialization = Initialization.getInstance();
+        ProjectList projectList = initialization.getProjectList();
+        for (Project p : projectList.getProjects().values()) {
+            if (p.getManagerName().equals(manager.getName())) {
+                manager.addProject(p);
+            }
+        }
+        System.out.println("Manager project initialization complete");
+    }
     private void applicantInitialize() {
         String filePath = "data/ApplicantList.csv";
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -71,7 +91,7 @@ public class Initialization {
                     applicantList.addApplicant(applicant);
                 }
             }
-
+            System.out.println("Applicant list has been initialized");
         } catch (IOException e) {
             System.err.println("Error reading Applicant CSV file: " + e.getMessage());
             e.printStackTrace();
@@ -105,6 +125,7 @@ public class Initialization {
                     managerList.addManager(manager);
                 }
             }
+            System.out.println("Manager list has been initialized");
 
         } catch (IOException e) {
             System.err.println("Error reading Manager CSV file: " + e.getMessage());
@@ -137,8 +158,10 @@ public class Initialization {
 
                     Officer officer = new Officer(name, age, nric, maritalStatus, password);
                     officerList.addOfficer(officer);
+                    officerProjectInitiate(officer);
                 }
             }
+            System.out.println("Officer list has been initialized");
 
         } catch (IOException e) {
             System.err.println("Error reading Officer CSV file: " + e.getMessage());
@@ -193,6 +216,7 @@ public class Initialization {
                             managerName, officerSlot, officerList);
 
                     projectList.addProject(project);
+                    System.out.println("Project list has been initialized");
                 }
             }
 
