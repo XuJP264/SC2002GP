@@ -9,10 +9,8 @@ public class Enquiry {
     public static void addApplicantEnquiry(Applicant applicant, Project project, String message) {
         // Ensure the applicant has an entry in the HashMap
         applicantEnquiry.putIfAbsent(applicant, new HashMap<>());
-
         // Ensure the project has an entry in the inner HashMap
         applicantEnquiry.get(applicant).putIfAbsent(project, new ArrayList<>());
-
         // Add the enquiry message to the list
         applicantEnquiry.get(applicant).get(project).add(message);
     }

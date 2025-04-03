@@ -10,7 +10,7 @@ public class OfficerApp extends ApplicantApp{
         System.out.println("Logged in as: " + officer.getName() + " (" + officer.getNRIC() + ")");
         while (true) {
             displayMainMenu();
-            int choice = ValidChoice.getValidChoice(scanner, 0, 15);
+            int choice = ValidChoice.getValidChoice(scanner, 0, 16);
 
             if (choice == 0) {
                 System.out.println("Logging out... Goodbye!");
@@ -36,7 +36,7 @@ public class OfficerApp extends ApplicantApp{
     protected static void displayMainMenu() {
         System.out.println("\n=== OFFICER MENU ===");
 
-        System.out.println("\n[Applicant Functions]");
+        System.out.println("\n=== APPLICANT MENU ===");
         System.out.println("1. View Eligible Projects");
         System.out.println("2. Apply for a Project");
         System.out.println("3. View Application Status");
@@ -45,15 +45,15 @@ public class OfficerApp extends ApplicantApp{
         System.out.println("6. View Project Inquiries");
         System.out.println("7. Edit Project Inquiry");
         System.out.println("8. Delete Project Inquiry");
-
+        System.out.println("9. Choose the Flat Type");
         System.out.println("\n[Officer Functions]");
-        System.out.println("9. Register to Manage Project");
-        System.out.println("10. View Registration Status");
-        System.out.println("11. View Managed Project Details");
-        System.out.println("12. Assist Applicant Booking");
-        System.out.println("13. Generate Booking Receipt");
-        System.out.println("14. View and Reply Inquiries");
-        System.out.println("15. Modify Password");
+        System.out.println("10. Register to Manage Project");
+        System.out.println("11. View Registration Status");
+        System.out.println("12. View Managed Project Details");
+        System.out.println("13. Assist Applicant Booking");
+        System.out.println("14. Generate Booking Receipt");
+        System.out.println("15. View and Reply Inquiries");
+        System.out.println("16. Modify Password");
         System.out.println("0. Logout");
     }
 
@@ -67,13 +67,14 @@ public class OfficerApp extends ApplicantApp{
             case 6 -> viewProjectInquiries(officer);
             case 7 -> editProjectInquiry(officer, scanner);
             case 8 -> deleteProjectInquiry(officer, scanner);
-            case 9 -> registerForProject(officer, scanner);
-            case 10 -> viewRegistrationStatus(officer);
-            case 11 -> viewManagedProjectDetails(officer);
-            case 12 -> assistFlatBooking(officer, scanner);
-            case 13 -> generateBookingReceipt(officer, scanner);
-            case 14 -> viewAndReplyInquiry(officer, scanner);
-            case 15 -> modifyPassword(officer, scanner);
+            case 9 -> chooseFlatType(officer, scanner);
+            case 10 -> registerForProject(officer, scanner);
+            case 11 -> viewRegistrationStatus(officer);
+            case 12 -> viewManagedProjectDetails(officer);
+            case 13 -> assistFlatBooking(officer, scanner);
+            case 14 -> generateBookingReceipt(officer, scanner);
+            case 15 -> viewAndReplyInquiry(officer, scanner);
+            case 16 -> modifyPassword(officer, scanner);
         }
     }
 
@@ -156,8 +157,28 @@ public class OfficerApp extends ApplicantApp{
         }
     }
     protected static void assistFlatBooking(Officer officer, Scanner scanner) {
+        for(Project project : officer.getProjectsInCharge()){
+            HashMap<Applicant, String> projectMap = Applications.getApplicationAndStatus(project);
+            if (projectMap != null) {
+                for(Applicant applicant : projectMap.keySet()){
+                    if(projectMap.get(applicant).equals("Accepted")){
+                        System.out.println("Applicant: " + applicant.getName());
+                        System.out.println("Project: " + project.getProjectName());
+                        System.out.println("Enter 1 to book flat or 2 to ignore");
+                        int choice = ValidChoice.getValidChoice(scanner, 1, 2);
+                        if (choice == 1) {
+                            System.out.println("Enter the number of flats to book");
+                            int numFlats = scanner.nextInt();
+                            scanner.nextLine();
+                    }
+                }
+            }
+        }
+        }
     }
+
     private static void generateBookingReceipt(Officer officer, Scanner scanner) {
+
     }
     private static void viewAndReplyInquiry(Officer officer, Scanner scanner) {
         ApplicantList applicants = Initialization.getInstance().getApplicantList();
@@ -187,10 +208,17 @@ public class OfficerApp extends ApplicantApp{
             }
         }
     }
-    private static void modifyPassword(Officer officer, Scanner scanner) {
-        System.out.print("Enter new password: ");
-        String newPassword = scanner.nextLine();
-        officer.setPassword(newPassword);
-        System.out.println("Password updated successfully");
-    }
+        protected static void modifyPassword(Officer officer, Scanner scanner) {
+            System.out.print("\nEnter new password: ");
+            String newPassword = scanner.nextLine();
+            System.out.print("Confirm new password: ");
+            String confirmPassword = scanner.nextLine();
+
+            if (newPassword.equals(confirmPassword)) {
+                officer.setPassword(newPassword);
+                System.out.println("Password updated successfully!");
+            } else {
+                System.out.println("Passwords do not match. Password not changed.");
+            }
+        }
 }

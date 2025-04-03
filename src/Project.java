@@ -64,5 +64,22 @@ public class Project {
     public void setType2Price(double price) {this.type2Price = price;}
     public void setOpeningDate(String openingDate) {this.openingDate = openingDate;}
     public void setClosingDate(String closingDate) {this.closingDate = closingDate;}
-
+    public void displayDetails() {
+        System.out.println("Project Name: " + projectName);
+        System.out.println("Neighborhood: " + neighborhood);
+        System.out.println("Type 1: " + type1 +
+                " | Units: " + type1Units +
+                " | Price: " + type1Price);
+        System.out.println("Type 2: " + type2 +
+                " | Units: " + type2Units +
+                " | Price: " + type2Price);
+        System.out.println("Opening Date: " + openingDate +
+                " | Closing Date: " + closingDate);
+        System.out.println("Manager: " + managerName);
+        System.out.println("Officer Slot: " + officerSlot +
+                " | Assigned Officers: " + officers);
+        System.out.println("Visible: " + visible);
+        System.out.println(officers.size() + " officers assigned.");
+        System.out.println();  // Add empty line for separation
+    }
 }

@@ -16,7 +16,11 @@ public class Applicant extends UserCard {
         this.appliedProject = project;
     }
     public String getApplicationStatus() {
-        return Applications.getApplicationAndStatus(appliedProject).get(this);
+        HashMap<Applicant,String> applicationStatusMap = Applications.getApplicationAndStatus(appliedProject);
+        if (applicationStatusMap == null) {
+            return "Project Not Found"; // 项目不存在
+        }
+        return applicationStatusMap.getOrDefault(this, "Not Applied"); // 申请状态，或默认值
     }
     public String getIdentity() {
         return identity;

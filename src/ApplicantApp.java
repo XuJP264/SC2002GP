@@ -12,7 +12,7 @@ public class ApplicantApp {
 
         while (true) {
             displayMainMenu();
-            int choice = ValidChoice.getValidChoice(scanner, 0, 8);
+            int choice = ValidChoice.getValidChoice(scanner, 0, 10);
 
             if (choice == 0) {
                 System.out.println("Logging out... Goodbye!");
@@ -33,6 +33,8 @@ public class ApplicantApp {
         System.out.println("6. View Project Inquiries");
         System.out.println("7. Edit Project Inquiry");
         System.out.println("8. Delete Project Inquiry");
+        System.out.println("9. Choose the Flat Type");
+        System.out.println("10. Modify Password");
         System.out.println("0. Logout");
     }
 
@@ -46,6 +48,8 @@ public class ApplicantApp {
             case 6 -> viewProjectInquiries(applicant);
             case 7 -> editProjectInquiry(applicant, scanner);
             case 8 -> deleteProjectInquiry(applicant, scanner);
+            case 9 -> chooseFlatType(applicant, scanner);
+            case 10 -> modifyPassword(applicant, scanner);
         }
     }
 
@@ -96,7 +100,18 @@ public class ApplicantApp {
             System.out.println("Invalid or ineligible project.");
             return;
         }
-
+        if (Applications.getApplications().containsKey(project) &&
+                Applications.getApplications().get(project).containsKey(applicant)) {
+            if (!"rejected".equals(Applications.getApplications().get(project).get(applicant))) {
+                System.out.println("You have already applied for this project.");
+                return;
+            }
+        }
+        if(!(applicant.getMaritalStatus().equalsIgnoreCase("Single") && applicant.getAge() >= 35)||
+                !(applicant.getMaritalStatus().equalsIgnoreCase("Married") && applicant.getAge() >= 21)){
+            System.out.println("You are not allowed to apply for this project.");
+            return;
+        }
         // Using static Applications class to manage applications
         Applications.addApplication(project, applicant, "Pending");
         applicant.setAppliedProject(project);
@@ -124,8 +139,18 @@ public class ApplicantApp {
             System.out.println("No application found to withdraw.");
             return;
         }
-        WithdrawApplication.addWithdrawal(project, applicant);
-        System.out.println("Withdraw message has been sent successfully.");
+        if (Applications.getApplicationAndStatus(project)!= null){
+            if (Applications.getApplications().get(project).get(applicant).equals("Pending")) {
+                WithdrawApplication.addWithdrawal(project, applicant);
+                System.out.println("Withdraw message has been sent successfully.");
+            }
+            else{
+                System.out.println("the application status is not pending, you cannot withdraw.");
+            }
+        }
+        else{
+            System.out.println("there is no application with the project.");
+        }
     }
 
     protected static void submitProjectInquiry(Applicant applicant, Scanner scanner) {
@@ -234,6 +259,53 @@ public class ApplicantApp {
             }
         } catch (NumberFormatException e) {
             System.out.println("Please enter a valid number.");
+        }
+    }
+    protected static void chooseFlatType(Applicant applicant, Scanner scanner) {
+        if (applicant.getApplicationStatus().equals("accepted")) {
+            System.out.println("You have already been accepted for the project.");
+            if (applicant.getMaritalStatus().equalsIgnoreCase("Single") && applicant.getAge() >= 35){
+                System.out.println("You can only choose the flat type: 2-Room. Choose 1 to continue, 0 to exit.");
+                int choice = ValidChoice.getValidChoice(scanner, 0, 1);
+                if (choice == 1) {
+                    Booking.addBooking(applicant.getAppliedProject(), applicant, "2-Room");
+                }
+                else {
+                    System.out.println("Exiting the application process.");
+                    return;
+                }
+            }
+            if(applicant.getMaritalStatus().equalsIgnoreCase("Married") && applicant.getAge() >= 21){
+                System.out.println("You can choose the flat type: 2-Room or 3-Room. Choose 1 or 2 to continue, 0 to exit.");
+                int choice = ValidChoice.getValidChoice(scanner, 0, 2);
+                if (choice == 1) {
+                    Booking.addBooking(applicant.getAppliedProject(), applicant, "2-Room");
+                }
+                else if (choice == 2) {
+                    Booking.addBooking(applicant.getAppliedProject(), applicant, "3-Room");
+                }
+                else {
+                    System.out.println("Exiting the application process.");
+                    return;
+                }
+            }
+        }
+        else{
+            System.out.println("You have not been accepted for the project yet.");
+            return;
+        }
+    }
+    protected static void modifyPassword(Applicant applicant, Scanner scanner) {
+        System.out.print("\nEnter new password: ");
+        String newPassword = scanner.nextLine();
+        System.out.print("Confirm new password: ");
+        String confirmPassword = scanner.nextLine();
+
+        if (newPassword.equals(confirmPassword)) {
+            applicant.setPassword(newPassword);
+            System.out.println("Password updated successfully!");
+        } else {
+            System.out.println("Passwords do not match. Password not changed.");
         }
     }
 }
