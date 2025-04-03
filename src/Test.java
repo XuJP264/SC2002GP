@@ -60,6 +60,7 @@ public class Test {
         System.out.println("Total projects: " + projects.size());
         for (String projectName : projects.keySet()) {
             Project project = projects.get(projectName);
+            project.displayDetails();
             System.out.println("Project Name: " + projectName);
             System.out.println("Neighborhood: " + project.getNeighborhood());
             System.out.println("Type 1: " + project.getType1() +

@@ -236,11 +236,7 @@ public class ManagerApp {
         ProjectList projectList = Initialization.getInstance().getProjectList();
         System.out.println("\n=== All Projects ===");
         for (Project p : projectList.getAllProjects()) {
-            System.out.println("\nProject: " + p.getProjectName());
-            System.out.println("Manager: " + p.getManagerName());
-            System.out.println("Status: " + (p.isVisible() ? "Visible" : "Hidden"));
-            System.out.println("Dates: " + LocalDate.parse(p.getOpeningDate()).format(DATE_DISPLAY_FORMATTER) +
-                    " to " + LocalDate.parse(p.getClosingDate()).format(DATE_DISPLAY_FORMATTER));
+            p.displayDetails();
         }
     }
 

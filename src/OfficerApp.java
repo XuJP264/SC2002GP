@@ -2,7 +2,10 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Map;
 public class OfficerApp extends ApplicantApp{
     public static void main(Officer officer) {
         Scanner scanner = new Scanner(System.in);
@@ -148,12 +151,7 @@ public class OfficerApp extends ApplicantApp{
 
         System.out.println("\n=== Managed Projects ===");
         for (Project p : projects) {
-            System.out.println("\nProject: " + p.getProjectName());
-            System.out.println("Neighborhood: " + p.getNeighborhood());
-            System.out.println("Type 1: " + p.getType1() + " (" + p.getType1Units() + " units)");
-            System.out.println("Type 2: " + p.getType2() + " (" + p.getType2Units() + " units)");
-            System.out.println("Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
-            System.out.println("Officers: " + p.getOfficers().size() + "/" + p.getOfficerSlot());
+           p.displayDetails();
         }
     }
     protected static void assistFlatBooking(Officer officer, Scanner scanner) {
@@ -166,7 +164,6 @@ public class OfficerApp extends ApplicantApp{
                    System.out.println("Enter 1 to finish booking or 0 to ignore applicant");
                    int choice = ValidChoice.getValidChoice(scanner, 0, 1);
                    if (choice == 1) {
-                       Booking.removeBooking(project, applicant);
                        Applications.updateApplicationStatus(project, applicant, "Booked");
                        if (Booking.getBookingType(project, applicant).equals("2-Room")) {
                            project.setType1Units(project.getType1Units() - 1);
@@ -185,7 +182,27 @@ public class OfficerApp extends ApplicantApp{
     }
 
     private static void generateBookingReceipt(Officer officer, Scanner scanner) {
-
+        for (Project project : officer.getProjectsInCharge()){
+            if(Applications.getApplicationAndStatus(project)!= null){
+                for(Applicant applicant : Applications.getApplicationAndStatus(project).keySet()){
+                    if(Applications.getApplicationAndStatus(project).get(applicant).equals("Booked")){
+                        String fileName = project.getProjectName() + "_" + applicant.getName() +".txt";
+                        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+                            writer.write("===== receipt =====\n");
+                            writer.write("Project: " + project.getProjectName() + "\n");
+                            writer.write("Neighborhood: " + project.getNeighborhood() + "\n");
+                            writer.write("Applicant: " + applicant.getName() + "\n");
+                            writer.write("Applicant NRIC: " + applicant.getNRIC() + "\n");
+                            writer.write("Booking Type: " + Booking.getBookingType(project, applicant) + "\n");
+                            writer.write("===== receipt over =====\n");
+                            System.out.println("receipt generated: " + fileName);
+                        } catch (IOException e) {
+                            System.err.println("receipt generation failed: " + e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
     }
     private static void viewAndReplyInquiry(Officer officer, Scanner scanner) {
         ApplicantList applicants = Initialization.getInstance().getApplicantList();
