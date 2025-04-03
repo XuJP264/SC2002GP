@@ -56,7 +56,7 @@ public class ManagerApp {
             case 7 -> viewPendingOfficerRegistrations();
             case 8 -> processOfficerRegistration(manager,scanner);
             case 9 -> processBTOApplication(manager, scanner);
-            case 10 -> processWithdrawalRequest(scanner);
+            case 10 -> processWithdrawalRequest(manager, scanner);
             case 11 -> generateApplicantsReport();
             case 12 -> viewAndReplyEnquiries(scanner, manager);
             case 13 -> modifyManagerPassword(manager, scanner);
@@ -354,8 +354,26 @@ public class ManagerApp {
         }
     }
 
-    protected static void processWithdrawalRequest(Scanner scanner) {
-        System.out.println("\nProcess withdrawal requests functionality coming soon");
+    protected static void processWithdrawalRequest(Manager manager, Scanner scanner) {
+        for (Project p : manager.getMyProject()){
+            Applicant withdrawalApplicant = WithdrawApplication.getWithdrawalApplicant(p);
+            if (withdrawalApplicant != null) {
+                System.out.println("Project: " + p.getProjectName());
+                System.out.println("Applicant: " + withdrawalApplicant.getName());
+                System.out.println("Do you want to withdraw the application? (y/n)");
+                String choice = scanner.nextLine();
+                if (choice.equalsIgnoreCase("y")) {
+                    WithdrawApplication.removeWithdrawal(p);
+                    Applications.updateApplicationStatus(p, withdrawalApplicant, "Withdrawn");
+                    Applications.removeApplication(p, withdrawalApplicant);
+                    System.out.println("Application withdrawn successfully.");
+                } else if (choice.equalsIgnoreCase("n")) {
+                    System.out.println("Application not withdrawn.");
+                } else {
+                    System.out.println("Invalid input. Please enter y or n.");
+                }
+            }
+        }
     }
 
     protected static void generateApplicantsReport() {

@@ -12,7 +12,7 @@ public class ApplicantApp {
 
         while (true) {
             displayMainMenu();
-            int choice = getValidChoice(scanner, 0, 8);
+            int choice = ValidChoice.getValidChoice(scanner, 0, 8);
 
             if (choice == 0) {
                 System.out.println("Logging out... Goodbye!");
@@ -34,17 +34,6 @@ public class ApplicantApp {
         System.out.println("7. Edit Project Inquiry");
         System.out.println("8. Delete Project Inquiry");
         System.out.println("0. Logout");
-    }
-
-    protected static int getValidChoice(Scanner scanner, int min, int max) {
-        while (true) {
-            System.out.print("Enter your choice (" + min + "-" + max + "): ");
-            try {
-                int choice = Integer.parseInt(scanner.nextLine());
-                if (choice >= min && choice <= max) return choice;
-            } catch (NumberFormatException ignored) {}
-            System.out.println("Invalid input. Try again.");
-        }
     }
 
     protected static void processChoice(Applicant applicant, Scanner scanner, int choice) {
@@ -135,7 +124,7 @@ public class ApplicantApp {
             System.out.println("No application found to withdraw.");
             return;
         }
-        WithdrawApplication.addWithdrawal(applicant, project);
+        WithdrawApplication.addWithdrawal(project, applicant);
         System.out.println("Withdraw message has been sent successfully.");
     }
 
