@@ -109,7 +109,7 @@ public class ApplicantApp {
         }
         if(!(applicant.getMaritalStatus().equalsIgnoreCase("Single") && applicant.getAge() >= 35)||
                 !(applicant.getMaritalStatus().equalsIgnoreCase("Married") && applicant.getAge() >= 21)){
-            System.out.println("You are not allowed to apply for this project.");
+            System.out.println("You are not allowed to apply for BTO projects.");
             return;
         }
         // Using static Applications class to manage applications
@@ -268,6 +268,10 @@ public class ApplicantApp {
                 System.out.println("You can only choose the flat type: 2-Room. Choose 1 to continue, 0 to exit.");
                 int choice = ValidChoice.getValidChoice(scanner, 0, 1);
                 if (choice == 1) {
+                    if (applicant.getAppliedProject().getType1Units()<=0){
+                        System.out.println("There are no 2-room units left for this project.");
+                        return;
+                    }
                     Booking.addBooking(applicant.getAppliedProject(), applicant, "2-Room");
                 }
                 else {
@@ -279,9 +283,21 @@ public class ApplicantApp {
                 System.out.println("You can choose the flat type: 2-Room or 3-Room. Choose 1 or 2 to continue, 0 to exit.");
                 int choice = ValidChoice.getValidChoice(scanner, 0, 2);
                 if (choice == 1) {
+                    if (applicant.getAppliedProject().getType1Units()<=0){
+                        System.out.println("There are no 2-room units left for this project.");
+                        Applications.removeApplication(applicant.getAppliedProject(), applicant);
+                        applicant.setAppliedProject(null);
+                        return;
+                    }
                     Booking.addBooking(applicant.getAppliedProject(), applicant, "2-Room");
                 }
                 else if (choice == 2) {
+                    if (applicant.getAppliedProject().getType2Units()<=0){
+                        System.out.println("There are no 3-room units left for this project.");
+                        Applications.removeApplication(applicant.getAppliedProject(), applicant);
+                        applicant.setAppliedProject(null);
+                        return;
+                    }
                     Booking.addBooking(applicant.getAppliedProject(), applicant, "3-Room");
                 }
                 else {

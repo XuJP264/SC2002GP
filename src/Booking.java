@@ -9,6 +9,9 @@ public class Booking {
         }
         bookings.get(project).put(applicant, status);
     }
+    public static HashMap<Applicant,String> getBookings(Project project) {
+        return bookings.get(project);
+    }
     public static String getBookingType(Project project, Applicant applicant) {
         if (!bookings.containsKey(project)) {
             return "No Booking";

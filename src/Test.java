@@ -54,7 +54,6 @@ public class Test {
         }
         System.out.println();
     }
-
     private static void testProjectList(ProjectList projectList) {
         System.out.println("=== Project List (Hashtable) ===");
         HashMap<String, Project> projects = projectList.getProjects();

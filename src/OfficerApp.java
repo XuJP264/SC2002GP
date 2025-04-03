@@ -157,24 +157,31 @@ public class OfficerApp extends ApplicantApp{
         }
     }
     protected static void assistFlatBooking(Officer officer, Scanner scanner) {
-        for(Project project : officer.getProjectsInCharge()){
-            HashMap<Applicant, String> projectMap = Applications.getApplicationAndStatus(project);
-            if (projectMap != null) {
-                for(Applicant applicant : projectMap.keySet()){
-                    if(projectMap.get(applicant).equals("Accepted")){
-                        System.out.println("Applicant: " + applicant.getName());
-                        System.out.println("Project: " + project.getProjectName());
-                        System.out.println("Enter 1 to book flat or 2 to ignore");
-                        int choice = ValidChoice.getValidChoice(scanner, 1, 2);
-                        if (choice == 1) {
-                            System.out.println("Enter the number of flats to book");
-                            int numFlats = scanner.nextInt();
-                            scanner.nextLine();
-                    }
-                }
-            }
-        }
-        }
+       for(Project project : officer.getProjectsInCharge()){
+           if(Booking.getBookings(project)!= null){
+               for(Applicant applicant : Booking.getBookings(project).keySet()) {
+                   System.out.println("Project: " + project.getProjectName());
+                   System.out.println("Applicant: " + applicant.getName());
+                   System.out.println("Booking Type: " + Booking.getBookingType(project, applicant));
+                   System.out.println("Enter 1 to finish booking or 0 to ignore applicant");
+                   int choice = ValidChoice.getValidChoice(scanner, 0, 1);
+                   if (choice == 1) {
+                       Booking.removeBooking(project, applicant);
+                       Applications.updateApplicationStatus(project, applicant, "Booked");
+                       if (Booking.getBookingType(project, applicant).equals("2-Room")) {
+                           project.setType1Units(project.getType1Units() - 1);
+                       }
+                       else if (Booking.getBookingType(project, applicant).equals("3-Room")){
+                           project.setType2Units(project.getType2Units() - 1);
+                       }
+                       System.out.println("Booking removed and application status updated");
+                   }
+               }
+           }
+           else {
+               System.out.println("No bookings found for this project"+project.getProjectName());
+           }
+       }
     }
 
     private static void generateBookingReceipt(Officer officer, Scanner scanner) {
