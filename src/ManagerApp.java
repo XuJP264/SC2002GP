@@ -1,9 +1,13 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class ManagerApp {
+    private static final DateTimeFormatter DATE_INPUT_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+    private static final DateTimeFormatter DATE_DISPLAY_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
     public static void main(Manager manager) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to HDB Manager Portal");
@@ -50,7 +54,7 @@ public class ManagerApp {
             case 5 -> viewAllProjects();
             case 6 -> viewMyProjects(manager);
             case 7 -> viewPendingOfficerRegistrations();
-            case 8 -> processOfficerRegistration(scanner);
+            case 8 -> processOfficerRegistration(manager,scanner);
             case 9 -> processBTOApplication(manager, scanner);
             case 10 -> processWithdrawalRequest(scanner);
             case 11 -> generateApplicantsReport();
@@ -103,9 +107,9 @@ public class ManagerApp {
         int type2Units = getValidIntInput(scanner, "Enter number of units for " + type2 + ": ");
         double type2Price = getValidDoubleInput(scanner, "Enter price for " + type2 + ": ");
 
-        // Date handling
-        LocalDate openingDate = getValidDateInput(scanner, "Enter Application Opening Date (yyyy-mm-dd): ");
-        LocalDate closingDate = getValidDateInput(scanner, "Enter Application Closing Date (yyyy-mm-dd): ");
+        // Date handling with new format
+        LocalDate openingDate = getValidDateInput(scanner, "Enter Application Opening Date (yyyy/mm/dd): ");
+        LocalDate closingDate = getValidDateInput(scanner, "Enter Application Closing Date (yyyy/mm/dd): ");
 
         if (closingDate.isBefore(openingDate)) {
             System.out.println("Closing date cannot be before opening date.");
@@ -173,8 +177,12 @@ public class ManagerApp {
                 project.setType2Price(newPrice);
             }
             case 5 -> {
-                LocalDate newOpen = getValidDateInput(scanner, "Current Opening Date: " + project.getOpeningDate() + "\nEnter new date (yyyy-mm-dd): ");
-                LocalDate newClose = getValidDateInput(scanner, "Current Closing Date: " + project.getClosingDate() + "\nEnter new date (yyyy-mm-dd): ");
+                LocalDate newOpen = getValidDateInput(scanner, "Current Opening Date: " +
+                        LocalDate.parse(project.getOpeningDate()).format(DATE_DISPLAY_FORMATTER) +
+                        "\nEnter new date (yyyy/mm/dd): ");
+                LocalDate newClose = getValidDateInput(scanner, "Current Closing Date: " +
+                        LocalDate.parse(project.getClosingDate()).format(DATE_DISPLAY_FORMATTER) +
+                        "\nEnter new date (yyyy/mm/dd): ");
 
                 if (newClose.isBefore(newOpen)) {
                     System.out.println("Closing date cannot be before opening date.");
@@ -239,6 +247,7 @@ public class ManagerApp {
         }
         return myProjects;
     }
+
     protected static void viewAllProjects() {
         ProjectList projectList = Initialization.getInstance().getProjectList();
         System.out.println("\n=== All Projects ===");
@@ -246,9 +255,11 @@ public class ManagerApp {
             System.out.println("\nProject: " + p.getProjectName());
             System.out.println("Manager: " + p.getManagerName());
             System.out.println("Status: " + (p.isVisible() ? "Visible" : "Hidden"));
-            System.out.println("Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
+            System.out.println("Dates: " + LocalDate.parse(p.getOpeningDate()).format(DATE_DISPLAY_FORMATTER) +
+                    " to " + LocalDate.parse(p.getClosingDate()).format(DATE_DISPLAY_FORMATTER));
         }
     }
+
     private static void displayProjectsWithNumbers(ArrayList<Project> projects) {
         for (int i = 0; i < projects.size(); i++) {
             System.out.println((i + 1) + ". " + projects.get(i).getProjectName());
@@ -281,9 +292,10 @@ public class ManagerApp {
         while (true) {
             System.out.print(prompt);
             try {
-                return LocalDate.parse(scanner.nextLine());
+                String input = scanner.nextLine().replace("-", "/");
+                return LocalDate.parse(input, DATE_INPUT_FORMATTER);
             } catch (Exception e) {
-                System.out.println("Invalid date format. Please use yyyy-mm-dd.");
+                System.out.println("Invalid date format. Please use yyyy/mm/dd.");
             }
         }
     }
@@ -318,7 +330,6 @@ public class ManagerApp {
         return false;
     }
 
-    // Placeholder methods for unimplemented functionality
     protected static void viewMyProjects(Manager manager) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
         ArrayList<Project> myProjects = getManagerProjects(manager, projectList);
@@ -332,7 +343,8 @@ public class ManagerApp {
         for (Project p : myProjects) {
             System.out.println("\nProject: " + p.getProjectName());
             System.out.println("Status: " + (p.isVisible() ? "Visible" : "Hidden"));
-            System.out.println("Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
+            System.out.println("Dates: " + LocalDate.parse(p.getOpeningDate()).format(DATE_DISPLAY_FORMATTER) +
+                    " to " + LocalDate.parse(p.getClosingDate()).format(DATE_DISPLAY_FORMATTER));
             System.out.println("Officers: " + p.getOfficers().size() + "/" + p.getOfficerSlot());
         }
     }
@@ -341,12 +353,48 @@ public class ManagerApp {
         System.out.println("\nPending officer registrations functionality coming soon");
     }
 
-    protected static void processOfficerRegistration(Scanner scanner) {
+    protected static void processOfficerRegistration(Manager manager, Scanner scanner) {
         System.out.println("\nProcess officer registrations functionality coming soon");
     }
 
     protected static void processBTOApplication(Manager manager, Scanner scanner) {
         System.out.println("\nProcess BTO applications functionality coming soon");
+        Initialization init = Initialization.getInstance();
+        ApplicantList applicantList = init.getApplicantList();
+        OfficerList officerList = init.getOfficerList();
+        HashMap<Applicant, HashMap<Project, String>> applications =Applications.getApplications();
+        for (Applicant a : applicantList.getAllApplicants()){
+            if(manager.getMyProject().contains(a.getAppliedProject())){
+                System.out.println(a.getName() + " applied for " + a.getAppliedProject().getProjectName());
+                System.out.println("Do you want to accept or reject the application?");
+                System.out.println("1. Accept");
+                System.out.println("2. Reject");
+                int choice = getValidChoice(scanner, 1, 2);
+                if(choice == 1){
+                    System.out.println("Applicant " + a.getName() + " has been accepted for project " + a.getAppliedProject().getProjectName());
+                    Applications.updateApplicationStatus(a, a.getAppliedProject(), "Accepted");
+                }else{
+                    System.out.println("Applicant " + a.getName() + " has been rejected for project " + a.getAppliedProject().getProjectName());
+                    Applications.updateApplicationStatus(a, a.getAppliedProject(), "Rejected");
+                }
+            }
+        }
+        for (Officer o : officerList.getAllOfficers()) {
+            if (manager.getMyProject().contains(o.getAppliedProject())) {
+                System.out.println(o.getName() + " applied for " + o.getAppliedProject().getProjectName());
+                System.out.println("Do you want to accept or reject the application?");
+                System.out.println("1. Accept");
+                System.out.println("2. Reject");
+                int choice = getValidChoice(scanner, 1, 2);
+                if (choice == 1) {
+                    System.out.println("Officer " + o.getName() + " has been accepted for project " + o.getAppliedProject().getProjectName());
+                    Applications.updateApplicationStatus(o, o.getAppliedProject(), "Accepted");
+                } else {
+                    System.out.println("Officer " + o.getName() + " has been rejected for project " + o.getAppliedProject().getProjectName());
+                    Applications.updateApplicationStatus(o, o.getAppliedProject(), "Rejected");
+                }
+            }
+        }
     }
 
     protected static void processWithdrawalRequest(Scanner scanner) {
