@@ -109,7 +109,7 @@ public class ApplicantApp {
         }
 
         // Using static Applications class to manage applications
-        Applications.addApplication(applicant, project, "Pending");
+        Applications.addApplication(project, applicant, "Pending");
         applicant.setAppliedProject(project);
         System.out.println("You have successfully applied for: " + projectName);
     }
@@ -122,8 +122,8 @@ public class ApplicantApp {
         }
 
         String status = Applications.getApplications()
-                .getOrDefault(applicant, new HashMap<>())
-                .getOrDefault(project, "Status not found");
+                .getOrDefault(project, new HashMap<>())
+                .getOrDefault(applicant, "Status not found");
 
         System.out.println("Project: " + project.getProjectName());
         System.out.println("Status: " + status);
@@ -148,12 +148,15 @@ public class ApplicantApp {
             System.out.println("Project not found.");
             return;
         }
-
+        if (project.isVisible() == false){
+            System.out.println("Project is not visible.");
+            return;
+        }
         System.out.print("Enter your inquiry: ");
         String inquiry = scanner.nextLine();
 
         if (!inquiry.isBlank()) {
-            applicant.addProjectEnquiry(project, inquiry);
+            Enquiry.addApplicantEnquiry(applicant, project, inquiry);
             System.out.println("Inquiry submitted for project: " + projectName);
         } else {
             System.out.println("Inquiry cannot be empty.");

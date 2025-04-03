@@ -48,4 +48,7 @@ public class Enquiry {
     public static HashMap<Project, ArrayList<String>> getEnquiryByApplicant(Applicant applicant) {
         return applicantEnquiry.get(applicant);
     }
+    public static ArrayList<String> getEnquiryByProject(Applicant applicant, Project project) {
+        return applicantEnquiry.get(applicant).get(project);
+    }
 }

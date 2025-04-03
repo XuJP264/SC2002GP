@@ -8,12 +8,9 @@ public class OfficerApp extends ApplicantApp{
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to HDB Officer Portal");
         System.out.println("Logged in as: " + officer.getName() + " (" + officer.getNRIC() + ")");
-
-        officerInitiate(officer);
-
         while (true) {
             displayMainMenu();
-            int choice = getValidChoice(scanner, 0, 16);
+            int choice = ValidChoice.getValidChoice(scanner, 0, 15);
 
             if (choice == 0) {
                 System.out.println("Logging out... Goodbye!");
@@ -55,9 +52,8 @@ public class OfficerApp extends ApplicantApp{
         System.out.println("11. View Managed Project Details");
         System.out.println("12. Assist Applicant Booking");
         System.out.println("13. Generate Booking Receipt");
-        System.out.println("14. View Inquiries");
-        System.out.println("15. Reply to Inquiries");
-        System.out.println("16. Modify Password");
+        System.out.println("14. View and Reply Inquiries");
+        System.out.println("15. Modify Password");
         System.out.println("0. Logout");
     }
 
@@ -76,9 +72,8 @@ public class OfficerApp extends ApplicantApp{
             case 11 -> viewManagedProjectDetails(officer);
             case 12 -> assistFlatBooking(officer, scanner);
             case 13 -> generateBookingReceipt(officer, scanner);
-            case 14 -> viewInquiry(officer, scanner);
-            case 15 -> replyInquiry(officer, scanner);
-            case 16 -> modifyPassword(officer, scanner);
+            case 14 -> viewAndReplyInquiry(officer, scanner);
+            case 15 -> modifyPassword(officer, scanner);
         }
     }
 
@@ -164,9 +159,33 @@ public class OfficerApp extends ApplicantApp{
     }
     private static void generateBookingReceipt(Officer officer, Scanner scanner) {
     }
-    private static void viewInquiry(Officer officer, Scanner scanner) {
-    }
-    private static void replyInquiry(Officer officer, Scanner scanner) {
+    private static void viewAndReplyInquiry(Officer officer, Scanner scanner) {
+        ApplicantList applicants = Initialization.getInstance().getApplicantList();
+        for (Applicant applicant : applicants.getAllApplicants()){
+            for(Project project : officer.getProjectsInCharge()){
+                if (Enquiry.getEnquiryByApplicant(applicant)!= null){
+                    System.out.println("Applicant: " + applicant.getName());
+                    System.out.println("Project: " + project.getProjectName());
+                    System.out.println("Inquiries: ");
+                    List<String> inquiries = Enquiry.getEnquiryByProject(applicant,project);
+                    for(int i = 0; i < inquiries.size(); i++){
+                        System.out.println(i+1 + ". " + inquiries.get(i));
+                    }
+                    System.out.println("Choose 1 to reply to inquiry and 2 to go back to main menu" );
+                    int choice = ValidChoice.getValidChoice(scanner, 1, 2);
+                    if (choice == 1) {
+                        System.out.println("Choose a number between 1 and " + inquiries.size() + " to reply to inquiry");
+                        choice = ValidChoice.getValidChoice(scanner, 1, inquiries.size());
+                        System.out.println("Enter your reply: ");
+                        String message = scanner.nextLine();
+                        Enquiry.upDateApplicantEnquiry(applicant, project, inquiries.get(choice - 1), inquiries.get(choice - 1) + " Replied by " + officer.getName() + ": " + message);
+                    }
+                    else if (choice == 2) {
+                        return;
+                    }
+                }
+            }
+        }
     }
     private static void modifyPassword(Officer officer, Scanner scanner) {
         System.out.print("Enter new password: ");

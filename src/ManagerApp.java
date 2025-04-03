@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +16,7 @@ public class ManagerApp {
 
         while (true) {
             displayMainMenu();
-            int choice = getValidChoice(scanner, 0, 14);
+            int choice = ValidChoice.getValidChoice(scanner, 0, 13);
 
             if (choice == 0) {
                 System.out.println("Logging out... Goodbye!");
@@ -39,9 +40,8 @@ public class ManagerApp {
         System.out.println("9. Process BTO applications");
         System.out.println("10. Process withdrawal requests");
         System.out.println("11. Generate applicants report");
-        System.out.println("12. View all enquiries");
-        System.out.println("13. View and reply to enquiries");
-        System.out.println("14. Modify password");
+        System.out.println("12. View and reply to enquiries");
+        System.out.println("13. Modify password");
         System.out.println("0. Logout");
     }
 
@@ -58,27 +58,10 @@ public class ManagerApp {
             case 9 -> processBTOApplication(manager, scanner);
             case 10 -> processWithdrawalRequest(scanner);
             case 11 -> generateApplicantsReport();
-            case 12 -> viewAllEnquiries();
-            case 13 -> viewAndReplyEnquiries(scanner);
-            case 14 -> modifyManagerPassword(manager, scanner);
+            case 12 -> viewAndReplyEnquiries(scanner, manager);
+            case 13 -> modifyManagerPassword(manager, scanner);
         }
     }
-
-    private static int getValidChoice(Scanner scanner, int min, int max) {
-        while (true) {
-            System.out.print("Enter your choice: ");
-            try {
-                int choice = Integer.parseInt(scanner.nextLine());
-                if (choice >= min && choice <= max) {
-                    return choice;
-                }
-                System.out.println("Invalid choice. Please enter a number between " + min + " and " + max + ".");
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-            }
-        }
-    }
-
     protected static void createNewBTOProject(Manager manager, Scanner scanner) {
         Initialization init = Initialization.getInstance();
         ProjectList projectList = init.getProjectList();
@@ -145,8 +128,8 @@ public class ManagerApp {
 
         System.out.println("\nYour Projects:");
         displayProjectsWithNumbers(myProjects);
-
-        int choice = getValidChoice(scanner, 1, myProjects.size(), "Enter the number of the project to edit: ");
+        System.out.print("Enter Project Number to be edited: ");
+        int choice = ValidChoice.getValidChoice(scanner, 1, myProjects.size());
         Project project = myProjects.get(choice - 1);
 
         System.out.println("\nEditing Project: " + project.getProjectName());
@@ -157,7 +140,7 @@ public class ManagerApp {
         System.out.println("4. Type 2 Price");
         System.out.println("5. Application Dates");
 
-        int fieldChoice = getValidChoice(scanner, 1, 5);
+        int fieldChoice = ValidChoice.getValidChoice(scanner, 1, 5);
 
         switch(fieldChoice) {
             case 1 -> {
@@ -207,7 +190,8 @@ public class ManagerApp {
         System.out.println("\nYour Projects:");
         displayProjectsWithNumbers(myProjects);
 
-        int choice = getValidChoice(scanner, 1, myProjects.size(), "Enter the number of the project to delete: ");
+        System.out.print("Enter Project Number to Delete: ");
+        int choice = ValidChoice.getValidChoice(scanner, 1, myProjects.size());
         Project project = myProjects.get(choice - 1);
 
         projectList.removeProject(project.getProjectName());
@@ -228,8 +212,8 @@ public class ManagerApp {
             String status = myProjects.get(i).isVisible() ? "Visible" : "Hidden";
             System.out.println((i + 1) + ". " + myProjects.get(i).getProjectName() + " - " + status);
         }
-
-        int choice = getValidChoice(scanner, 1, myProjects.size(), "Enter the number of the project to toggle: ");
+        System.out.print("Enter Project Number to Toggle: ");
+        int choice = ValidChoice.getValidChoice(scanner, 1, myProjects.size());
         Project project = myProjects.get(choice - 1);
 
         project.setVisible(!project.isVisible());
@@ -300,21 +284,6 @@ public class ManagerApp {
         }
     }
 
-    private static int getValidChoice(Scanner scanner, int min, int max, String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            try {
-                int choice = Integer.parseInt(scanner.nextLine());
-                if (choice >= min && choice <= max) {
-                    return choice;
-                }
-                System.out.println("Please enter a number between " + min + " and " + max + ".");
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
-            }
-        }
-    }
-
     private static boolean hasOverlappingProjects(Manager manager, ProjectList projectList,
                                                   LocalDate newOpen, LocalDate newClose) {
         for (Project p : projectList.getAllProjects()) {
@@ -359,40 +328,28 @@ public class ManagerApp {
 
     protected static void processBTOApplication(Manager manager, Scanner scanner) {
         System.out.println("\nProcess BTO applications functionality coming soon");
-        Initialization init = Initialization.getInstance();
-        ApplicantList applicantList = init.getApplicantList();
-        OfficerList officerList = init.getOfficerList();
-        HashMap<Applicant, HashMap<Project, String>> applications =Applications.getApplications();
-        for (Applicant a : applicantList.getAllApplicants()){
-            if(manager.getMyProject().contains(a.getAppliedProject())){
-                System.out.println(a.getName() + " applied for " + a.getAppliedProject().getProjectName());
-                System.out.println("Do you want to accept or reject the application?");
-                System.out.println("1. Accept");
-                System.out.println("2. Reject");
-                int choice = getValidChoice(scanner, 1, 2);
-                if(choice == 1){
-                    System.out.println("Applicant " + a.getName() + " has been accepted for project " + a.getAppliedProject().getProjectName());
-                    Applications.updateApplicationStatus(a, a.getAppliedProject(), "Accepted");
-                }else{
-                    System.out.println("Applicant " + a.getName() + " has been rejected for project " + a.getAppliedProject().getProjectName());
-                    Applications.updateApplicationStatus(a, a.getAppliedProject(), "Rejected");
+        if (manager.getMyProject().isEmpty()){
+            System.out.println("You don't have any projects to apply for.");
+            return;
+        }
+        for( Project p : manager.getMyProject() ){
+            System.out.println(p.getProjectName());
+            HashMap<Applicant, String> applicationAndStatus = Applications.getApplicationAndStatus(p);
+            if(!applicationAndStatus.isEmpty()){
+                for(Applicant a : applicationAndStatus.keySet()){
+                    System.out.println(a.getName() + " - " + applicationAndStatus.get(a));
+                    System.out.println("Choose wheter to accept or reject the application: ");
+                    System.out.println("enter 1. Accept and 2. Reject the application: ");
+                    int choice = ValidChoice.getValidChoice(scanner, 1, 2);
+                    if(choice == 1){
+                        Applications.updateApplicationStatus(p, a, "Accepted");
+                    }else{
+                        Applications.updateApplicationStatus(p, a, "Rejected");
+                    }
                 }
             }
-        }
-        for (Officer o : officerList.getAllOfficers()) {
-            if (manager.getMyProject().contains(o.getAppliedProject())) {
-                System.out.println(o.getName() + " applied for " + o.getAppliedProject().getProjectName());
-                System.out.println("Do you want to accept or reject the application?");
-                System.out.println("1. Accept");
-                System.out.println("2. Reject");
-                int choice = getValidChoice(scanner, 1, 2);
-                if (choice == 1) {
-                    System.out.println("Officer " + o.getName() + " has been accepted for project " + o.getAppliedProject().getProjectName());
-                    Applications.updateApplicationStatus(o, o.getAppliedProject(), "Accepted");
-                } else {
-                    System.out.println("Officer " + o.getName() + " has been rejected for project " + o.getAppliedProject().getProjectName());
-                    Applications.updateApplicationStatus(o, o.getAppliedProject(), "Rejected");
-                }
+            else{
+                System.out.println("No applications found for this project.");
             }
         }
     }
@@ -405,12 +362,33 @@ public class ManagerApp {
         System.out.println("\nGenerate applicants report functionality coming soon");
     }
 
-    protected static void viewAllEnquiries() {
-        System.out.println("\nView all enquiries functionality coming soon");
-    }
-
-    protected static void viewAndReplyEnquiries(Scanner scanner) {
-        System.out.println("\nView and reply to enquiries functionality coming soon");
+    protected static void viewAndReplyEnquiries(Scanner scanner, Manager manager) {
+        ApplicantList applicants = Initialization.getInstance().getApplicantList();
+        for (Applicant applicant : applicants.getAllApplicants()){
+            for(Project project : manager.getMyProject()){
+                if (Enquiry.getEnquiryByApplicant(applicant)!= null){
+                    System.out.println("Applicant: " + applicant.getName());
+                    System.out.println("Project: " + project.getProjectName());
+                    System.out.println("Inquiries: ");
+                    List<String> inquiries = Enquiry.getEnquiryByProject(applicant,project);
+                    for(int i = 0; i < inquiries.size(); i++){
+                        System.out.println(i+1 + ". " + inquiries.get(i));
+                    }
+                    System.out.println("Choose 1 to reply to inquiry and 2 to go back to main menu" );
+                    int choice = ValidChoice.getValidChoice(scanner, 1, 2);
+                    if (choice == 1) {
+                        System.out.println("Choose a number between 1 and " + inquiries.size() + " to reply to inquiry");
+                        choice = ValidChoice.getValidChoice(scanner, 1, inquiries.size());
+                        System.out.println("Enter your reply: ");
+                        String message = scanner.nextLine();
+                        Enquiry.upDateApplicantEnquiry(applicant, project, inquiries.get(choice - 1), inquiries.get(choice - 1) + " Replied by " + manager.getName() + ": " + message);
+                    }
+                    else if (choice == 2) {
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     protected static void modifyManagerPassword(Manager manager, Scanner scanner) {
