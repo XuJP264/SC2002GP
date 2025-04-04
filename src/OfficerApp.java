@@ -70,7 +70,7 @@ public class OfficerApp extends ApplicantApp{
             case 6 -> viewProjectInquiries(officer);
             case 7 -> editProjectInquiry(officer, scanner);
             case 8 -> deleteProjectInquiry(officer, scanner);
-            case 9 -> chooseFlatType(officer, scanner);
+            case 9 -> chooseFlat(officer, scanner);
             case 10 -> registerForProject(officer, scanner);
             case 11 -> viewRegistrationStatus(officer);
             case 12 -> viewManagedProjectDetails(officer);

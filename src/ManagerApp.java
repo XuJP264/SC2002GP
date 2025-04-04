@@ -331,16 +331,18 @@ public class ManagerApp {
         for( Project p : manager.getMyProject() ){
             System.out.println(p.getProjectName());
             HashMap<Applicant, String> applicationAndStatus = Applications.getApplicationAndStatus(p);
-            if(!applicationAndStatus.isEmpty()){
+            if(applicationAndStatus != null){
                 for(Applicant a : applicationAndStatus.keySet()){
-                    System.out.println(a.getName() + " - " + applicationAndStatus.get(a));
-                    System.out.println("Choose wheter to accept or reject the application: ");
-                    System.out.println("enter 1. Accept and 2. Reject the application: ");
-                    int choice = ValidChoice.getValidChoice(scanner, 1, 2);
-                    if(choice == 1){
-                        Applications.updateApplicationStatus(p, a, "Accepted");
-                    }else{
-                        Applications.updateApplicationStatus(p, a, "Rejected");
+                    if(applicationAndStatus.get(a).contains("Pending")){
+                        System.out.println(a.getName() + " - " + applicationAndStatus.get(a));
+                        System.out.println("Choose wheter to accept or reject the application: ");
+                        System.out.println("enter 1. Accept and 2. Reject the application: ");
+                        int choice = ValidChoice.getValidChoice(scanner, 1, 2);
+                        if(choice == 1){
+                            Applications.updateApplicationStatus(p, a, "Succesful "+a.getFlatType());
+                        }else{
+                            Applications.updateApplicationStatus(p, a, "Unsuccessful");
+                        }
                     }
                 }
             }
@@ -373,7 +375,7 @@ public class ManagerApp {
     }
 
     protected static void generateApplicantsReport() {
-        System.out.println("\nGenerate applicants report functionality coming soon");
+
     }
 
     protected static void viewAndReplyEnquiries(Scanner scanner, Manager manager) {

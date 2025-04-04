@@ -33,7 +33,7 @@ public class ApplicantApp {
         System.out.println("6. View Project Inquiries");
         System.out.println("7. Edit Project Inquiry");
         System.out.println("8. Delete Project Inquiry");
-        System.out.println("9. Choose the Flat Type");
+        System.out.println("9. Choose the Flat When Your Application is Approved");
         System.out.println("10. Modify Password");
         System.out.println("0. Logout");
     }
@@ -48,7 +48,7 @@ public class ApplicantApp {
             case 6 -> viewProjectInquiries(applicant);
             case 7 -> editProjectInquiry(applicant, scanner);
             case 8 -> deleteProjectInquiry(applicant, scanner);
-            case 9 -> chooseFlatType(applicant, scanner);
+            case 9 -> chooseFlat(applicant, scanner);
             case 10 -> modifyPassword(applicant, scanner);
         }
     }
@@ -112,10 +112,37 @@ public class ApplicantApp {
             System.out.println("You are not allowed to apply for BTO projects.");
             return;
         }
-        // Using static Applications class to manage applications
-        Applications.addApplication(project, applicant, "Pending");
-        applicant.setAppliedProject(project);
-        System.out.println("You have successfully applied for: " + projectName);
+        if(applicant.getMaritalStatus().equalsIgnoreCase("Single") && applicant.getAge() >= 35){
+            System.out.println("You can only apply for 2-Room projects. Choose 1 to continue, 0 to exit.");
+            int choice = ValidChoice.getValidChoice(scanner, 0, 1);
+            if (choice == 0) {
+                return;
+            }
+            if (choice == 1) {
+                Applications.addApplication(project, applicant, "Pending"+" 2-Room");
+                applicant.setAppliedProject(project);
+                applicant.setFlatType("2-Room");
+                System.out.println("You have successfully applied for: " + projectName + " 2-Room");
+            }
+        }
+        if(applicant.getMaritalStatus().equalsIgnoreCase("Married") && applicant.getAge() >= 21){
+            System.out.println("You can apply for 2-Room or 3-Room projects.  Choose 1 to 2-Room, 2 to 3-Room, 0 to exit.");
+            int choice = ValidChoice.getValidChoice(scanner, 0, 2);
+            if (choice == 0) {
+                return;
+            }
+            if (choice == 1) {
+                Applications.addApplication(project, applicant, "Pending"+" 2-Room");
+                applicant.setAppliedProject(project);
+                applicant.setFlatType("2-Room");
+                System.out.println("You have successfully applied for: " + projectName + " 2-Room");
+            }
+            else if (choice == 2) {
+                Applications.addApplication(project, applicant, "Pending"+" 3-Room");
+                applicant.setAppliedProject(project);
+                applicant.setFlatType("3-Room");
+            }
+        }
     }
 
     protected static void viewApplicationStatus(Applicant applicant) {
@@ -140,7 +167,7 @@ public class ApplicantApp {
             return;
         }
         if (Applications.getApplicationAndStatus(project)!= null){
-            if (Applications.getApplications().get(project).get(applicant).equals("Pending")) {
+            if (Applications.getApplications().get(project).get(applicant).contains("Pending")) {
                 WithdrawApplication.addWithdrawal(project, applicant);
                 System.out.println("Withdraw message has been sent successfully.");
             }
@@ -261,49 +288,22 @@ public class ApplicantApp {
             System.out.println("Please enter a valid number.");
         }
     }
-    protected static void chooseFlatType(Applicant applicant, Scanner scanner) {
-        if (applicant.getApplicationStatus().equals("accepted")) {
+    protected static void chooseFlat(Applicant applicant, Scanner scanner) {
+        if (applicant.getApplicationStatus().contains("Successful")) {
             System.out.println("You have already been accepted for the project.");
-            if (applicant.getMaritalStatus().equalsIgnoreCase("Single") && applicant.getAge() >= 35){
-                System.out.println("You can only choose the flat type: 2-Room. Choose 1 to continue, 0 to exit.");
-                int choice = ValidChoice.getValidChoice(scanner, 0, 1);
-                if (choice == 1) {
-                    if (applicant.getAppliedProject().getType1Units()<=0){
-                        System.out.println("There are no 2-room units left for this project.");
-                        return;
-                    }
-                    Booking.addBooking(applicant.getAppliedProject(), applicant, "2-Room");
-                }
-                else {
-                    System.out.println("Exiting the application process.");
-                    return;
-                }
+            if (applicant.getFlatType().equalsIgnoreCase("2-Room")) {
+                System.out.println("Your flat type is 2-Room.");
+                System.out.println("Choose a flat number from 1 to "
+                        + applicant.getAppliedProject().getType1Units() + " to continue.");
+                int choice = ValidChoice.getValidChoice(scanner, 1,  applicant.getAppliedProject().getType1Units());
+                Booking.addBooking(applicant.getAppliedProject(),applicant, "2-Room");
             }
-            if(applicant.getMaritalStatus().equalsIgnoreCase("Married") && applicant.getAge() >= 21){
-                System.out.println("You can choose the flat type: 2-Room or 3-Room. Choose 1 or 2 to continue, 0 to exit.");
-                int choice = ValidChoice.getValidChoice(scanner, 0, 2);
-                if (choice == 1) {
-                    if (applicant.getAppliedProject().getType1Units()<=0){
-                        System.out.println("There are no 2-room units left for this project.");
-                        Applications.removeApplication(applicant.getAppliedProject(), applicant);
-                        applicant.setAppliedProject(null);
-                        return;
-                    }
-                    Booking.addBooking(applicant.getAppliedProject(), applicant, "2-Room");
-                }
-                else if (choice == 2) {
-                    if (applicant.getAppliedProject().getType2Units()<=0){
-                        System.out.println("There are no 3-room units left for this project.");
-                        Applications.removeApplication(applicant.getAppliedProject(), applicant);
-                        applicant.setAppliedProject(null);
-                        return;
-                    }
-                    Booking.addBooking(applicant.getAppliedProject(), applicant, "3-Room");
-                }
-                else {
-                    System.out.println("Exiting the application process.");
-                    return;
-                }
+            else if (applicant.getFlatType().equalsIgnoreCase("3-Room")) {
+                System.out.println("Your flat type is 3-Room.");
+                System.out.println("Choose a flat number from 1 to "
+                        + (applicant.getAppliedProject().getType1Units() + applicant.getAppliedProject().getType2Units()) + " to continue.");
+                int choice = ValidChoice.getValidChoice(scanner, 1,  applicant.getAppliedProject().getType2Units());
+                Booking.addBooking(applicant.getAppliedProject(),applicant, "3-Room");
             }
         }
         else{
