@@ -53,7 +53,7 @@ public class ManagerApp {
             case 4 -> toggleProjectVisibility(manager, scanner);
             case 5 -> viewAllProjects();
             case 6 -> viewMyProjects(manager);
-            case 7 -> viewPendingOfficerRegistrations();
+            case 7 -> viewPendingOfficerRegistrations(manager,scanner);
             case 8 -> processOfficerRegistration(manager,scanner);
             case 9 -> processBTOApplication(manager, scanner);
             case 10 -> processWithdrawalRequest(manager, scanner);
@@ -314,59 +314,148 @@ public class ManagerApp {
         }
     }
 
-    protected static void viewPendingOfficerRegistrations() {
-        System.out.println("\nPending officer registrations functionality coming soon");
+    protected static void viewPendingOfficerRegistrations(Manager manager, Scanner scanner) {
+        // Retrieve the projects created by the manager
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        ArrayList<Project> myProjects = getManagerProjects(manager, projectList);
+        boolean pendingFound = false;
+        
+        // Iterate over each project created by the manager
+        for (Project p : myProjects) {
+            // Iterate over all officers that have registrations
+            for (Officer officer : RegistrationList.getRegistrationList().keySet()){
+                // Retrieve the registration conditions for the officer as a map of <Project, String>
+                HashMap<Project, String> conditions = RegistrationList.getRegistrationConditions(officer);
+                // Check if this officer's registration for project p is pending (i.e. equals "Pending")
+                if (conditions.containsKey(p) && "Pending".equalsIgnoreCase(conditions.get(p))) {
+                    pendingFound = true;
+                    System.out.println("Pending registration: Officer " + officer.getName() 
+                            + " for project " + p.getProjectName());
+                }
+            }
+        }
+        if (!pendingFound) {
+            System.out.println("No pending officer registrations found for your projects.");
+        }
     }
+
 
     protected static void processOfficerRegistration(Manager manager, Scanner scanner) {
-        System.out.println("\nProcess officer registrations functionality coming soon");
-    }
-
-    protected static void processBTOApplication(Manager manager, Scanner scanner) {
-        System.out.println("\nProcess BTO applications functionality coming soon");
-        if (manager.getMyProject().isEmpty()){
-            System.out.println("You don't have any projects to apply for.");
-            return;
-        }
-        for( Project p : manager.getMyProject() ){
-            System.out.println(p.getProjectName());
-            HashMap<Applicant, String> applicationAndStatus = Applications.getApplicationAndStatus(p);
-            if(applicationAndStatus != null){
-                for(Applicant a : applicationAndStatus.keySet()){
-                    if(applicationAndStatus.get(a).contains("Pending")){
-                        System.out.println(a.getName() + " - " + applicationAndStatus.get(a));
-                        System.out.println("Choose wheter to accept or reject the application: ");
-                        System.out.println("enter 1. Accept and 2. Reject the application: ");
+        // Get the projects created by the manager
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        ArrayList<Project> myProjects = getManagerProjects(manager, projectList);
+        boolean foundPending = false;
+        
+        // Iterate over each project created by this manager
+        for (Project p : myProjects) {
+            System.out.println("\nProject: " + p.getProjectName());
+            // Get the complete registration list from RegistrationList
+            HashMap<Officer, ArrayList<Project>> regList = RegistrationList.getRegistrationList();
+            
+            // Iterate through each officer in the registration list
+            for (Officer officer : regList.keySet()) {
+                ArrayList<Project> officerProjects = regList.get(officer);
+                // Check if this officer has registered for the current project
+                if (officerProjects.contains(p)) {
+                    // Retrieve the registration condition (as a String) for this officer and project
+                    String condition = RegistrationList.getRegistrationCondition(officer, p);
+                    if ("Pending".equalsIgnoreCase(condition)) {
+                        foundPending = true;
+                        System.out.println("Officer " + officer.getName() + " has requested to register for project " + p.getProjectName());
+                        System.out.println("Enter 1 to Approve or 2 to Reject this registration:");
                         int choice = ValidChoice.getValidChoice(scanner, 1, 2);
-                        if(choice == 1){
-                            Applications.updateApplicationStatus(p, a, "Succesful "+a.getFlatType());
-                        }else{
-                            Applications.updateApplicationStatus(p, a, "Unsuccessful");
+                        
+                        if (choice == 1) {
+                            // Approve: update condition to "Approved" and add officer to project if not already added
+                            RegistrationList.addRegistrationCondition(officer, p, "Approved");
+                            if (!p.getOfficers().contains(officer.getName())) {
+                                p.addOfficer(officer.getName());
+                            }
+                            System.out.println("Officer " + officer.getName() + " approved for project " + p.getProjectName());
+                        } else {
+                            // Reject: update condition to "Rejected" and remove registration
+                            RegistrationList.addRegistrationCondition(officer, p, "Rejected");
+                            RegistrationList.removeRegistration(officer, p);
+                            System.out.println("Officer " + officer.getName() + " registration rejected for project " + p.getProjectName());
                         }
                     }
                 }
             }
-            else{
-                System.out.println("No applications found for this project.");
+        }
+        
+        if (!foundPending) {
+            System.out.println("No pending officer registrations found for your projects.");
+        }
+    }
+
+    protected static void processBTOApplication(Manager manager, Scanner scanner) {
+        if (manager.getMyProject().isEmpty()){
+            System.out.println("You don't have any projects with applications.");
+            return;
+        }
+        for (Project p : manager.getMyProject()) {
+            System.out.println("\nProject: " + p.getProjectName());
+            HashMap<Applicant, String> applicationAndStatus = Applications.getApplicationAndStatus(p);
+            if (applicationAndStatus != null && !applicationAndStatus.isEmpty()){
+                for (Applicant a : applicationAndStatus.keySet()){
+                    String status = applicationAndStatus.get(a);
+                    if (status.equalsIgnoreCase("Pending")){
+                        // Assume applicant a has a flatType field indicating "2-Room" or "3-Room"
+                        System.out.println("Applicant: " + a.getName() + " applied for flat type: " + a.getFlatType());
+                        System.out.println("Current status: " + status);
+                        System.out.println("Enter 1 to Approve or 2 to Reject this application:");
+                        int choice = ValidChoice.getValidChoice(scanner, 1, 2);
+                        if (choice == 1) {
+                            String flatType = a.getFlatType();
+                            if (flatType.equalsIgnoreCase("2-Room")) {
+                                if (p.getType1Units() > 0) {
+                                    p.setType1Units(p.getType1Units() - 1);
+                                    Applications.updateApplicationStatus(p, a, "Successful - 2-Room booked");
+                                    System.out.println("Application approved. 2-Room booked for " + a.getName());
+                                } else {
+                                    Applications.updateApplicationStatus(p, a, "Rejected - No 2-Room units available");
+                                    System.out.println("No 2-Room units available. Application rejected.");
+                                }
+                            } else if (flatType.equalsIgnoreCase("3-Room")) {
+                                if (p.getType2Units() > 0) {
+                                    p.setType2Units(p.getType2Units() - 1);
+                                    Applications.updateApplicationStatus(p, a, "Successful - 3-Room booked");
+                                    System.out.println("Application approved. 3-Room booked for " + a.getName());
+                                } else {
+                                    Applications.updateApplicationStatus(p, a, "Rejected - No 3-Room units available");
+                                    System.out.println("No 3-Room units available. Application rejected.");
+                                }
+                            } else {
+                                System.out.println("Unknown flat type for applicant " + a.getName() + ". Skipping.");
+                            }
+                        } else {
+                            Applications.updateApplicationStatus(p, a, "Unsuccessful");
+                            System.out.println("Application rejected for " + a.getName());
+                        }
+                    }
+                }
+            } else {
+                System.out.println("No pending applications for project " + p.getProjectName());
             }
         }
     }
+
 
     protected static void processWithdrawalRequest(Manager manager, Scanner scanner) {
         for (Project p : manager.getMyProject()){
             Applicant withdrawalApplicant = WithdrawApplication.getWithdrawalApplicant(p);
             if (withdrawalApplicant != null) {
-                System.out.println("Project: " + p.getProjectName());
-                System.out.println("Applicant: " + withdrawalApplicant.getName());
-                System.out.println("Do you want to withdraw the application? (y/n)");
-                String choice = scanner.nextLine();
+                System.out.println("\nProject: " + p.getProjectName());
+                System.out.println("Withdrawal request from applicant: " + withdrawalApplicant.getName());
+                System.out.println("Do you want to approve the withdrawal? (y/n)");
+                String choice = scanner.nextLine().trim();
                 if (choice.equalsIgnoreCase("y")) {
                     WithdrawApplication.removeWithdrawal(p);
                     Applications.updateApplicationStatus(p, withdrawalApplicant, "Withdrawn");
                     Applications.removeApplication(p, withdrawalApplicant);
                     System.out.println("Application withdrawn successfully.");
                 } else if (choice.equalsIgnoreCase("n")) {
-                    System.out.println("Application not withdrawn.");
+                    System.out.println("Withdrawal request not processed.");
                 } else {
                     System.out.println("Invalid input. Please enter y or n.");
                 }
