@@ -58,7 +58,7 @@ public class ManagerApp {
             case 8 -> processOfficerRegistration(manager,scanner);
             case 9 -> processBTOApplication(manager, scanner);
             case 10 -> processWithdrawalRequest(manager, scanner);
-            case 11 -> generateApplicantsReport();
+            case 11 -> generateApplicantsReport(manager, scanner);
             case 12 -> viewAndReplyEnquiries(scanner, manager);
             case 13 -> modifyManagerPassword(manager, scanner);
             case 14 -> viewProjectsByFilter(manager, scanner);
@@ -465,8 +465,45 @@ public class ManagerApp {
         }
     }
 
-    protected static void generateApplicantsReport() {
-}
+    protected static void generateApplicantsReport(Manager manager, Scanner scanner) {
+        // Get the manager's projects from the global project list
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        ArrayList<Project> myProjects = getManagerProjects(manager, projectList);
+        
+        System.out.println("\n=== Applicants Report ===");
+        System.out.print("Would you like to filter by marital status? (y/n): ");
+        String filterChoice = scanner.nextLine().trim();
+        String filterStatus = "";
+        if (filterChoice.equalsIgnoreCase("y")) {
+            System.out.print("Enter marital status to filter by (e.g., Married or Single): ");
+            filterStatus = scanner.nextLine().trim();}
+        
+        boolean reportFound = false;
+        // Iterate over each project created by the manager,,,
+        for (Project p : myProjects) {
+            HashMap<Applicant, String> bookingsForProject = Booking.getBookings(p);
+            if (bookingsForProject != null && !bookingsForProject.isEmpty()) {
+                System.out.println("\nProject: " + p.getProjectName());
+                // Iterate over each applicant who has a booking
+                for (Applicant a : bookingsForProject.keySet()) {
+                    // If filtering is enabled, skip applicants whose marital status dont match
+                    if (!filterStatus.isEmpty() && !a.getMaritalStatus().equalsIgnoreCase(filterStatus)) {
+                        continue;
+                    }
+                    String bookingStatus = bookingsForProject.get(a);
+                    System.out.println("Applicant: " + a.getName() + " (" + a.getNRIC() + ")");
+                    System.out.println("Marital Status: " + a.getMaritalStatus());
+                    System.out.println("Booking Status: " + bookingStatus);
+                    System.out.println("------------------------------------");
+                    reportFound = true;
+                }
+            }
+        }
+        if (!reportFound) {
+            System.out.println("No booking records found that match the criteria.");
+        }
+    }
+
 
     protected static void viewAndReplyEnquiries(Scanner scanner, Manager manager) {
         ApplicantList applicants = Initialization.getInstance().getApplicantList();
