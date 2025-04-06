@@ -16,7 +16,7 @@ public class ManagerApp {
 
         while (true) {
             displayMainMenu();
-            int choice = ValidChoice.getValidChoice(scanner, 0, 13);
+            int choice = ValidChoice.getValidChoice(scanner, 0, 14);
 
             if (choice == 0) {
                 System.out.println("Logging out... Goodbye!");
@@ -42,6 +42,7 @@ public class ManagerApp {
         System.out.println("11. Generate applicants report");
         System.out.println("12. View and reply to enquiries");
         System.out.println("13. Modify password");
+        System.out.println("14. View projects by filter");
         System.out.println("0. Logout");
     }
 
@@ -60,6 +61,7 @@ public class ManagerApp {
             case 11 -> generateApplicantsReport();
             case 12 -> viewAndReplyEnquiries(scanner, manager);
             case 13 -> modifyManagerPassword(manager, scanner);
+            case 14 -> viewProjectsByFilter(manager, scanner);
         }
     }
     protected static void createNewBTOProject(Manager manager, Scanner scanner) {
@@ -464,8 +466,7 @@ public class ManagerApp {
     }
 
     protected static void generateApplicantsReport() {
-
-    }
+}
 
     protected static void viewAndReplyEnquiries(Scanner scanner, Manager manager) {
         ApplicantList applicants = Initialization.getInstance().getApplicantList();
@@ -507,6 +508,39 @@ public class ManagerApp {
             System.out.println("Password updated successfully!");
         } else {
             System.out.println("Passwords do not match. Password not changed.");
+        }
+    }
+    
+    protected static void viewProjectsByFilter(Manager manager, Scanner scanner) {
+        System.out.println("\n=== View Projects By Filter ===");
+        
+        // Ask for filter criteria
+        System.out.print("Enter location filter (or press Enter to show all): ");
+        String location = scanner.nextLine().trim();
+        System.out.print("Enter flat type filter (e.g., 2-Room or 3-Room, or press Enter to show all): ");
+        String flatType = scanner.nextLine().trim();
+        
+        // Retrieve all projects from the global ProjectList
+        ProjectList projectList = Initialization.getInstance().getProjectList();
+        List<Project> allProjects = projectList.getAllProjects();
+        
+        // Use ViewBy.filterAndSort to filter and sort projects alphabetically by project name
+        List<Project> filteredProjects = ViewBy.filterAndSort(allProjects, p -> {
+            boolean locationMatches = location.isEmpty() || p.getNeighborhood().equalsIgnoreCase(location);
+            boolean flatTypeMatches = flatType.isEmpty() ||
+                    p.getType1().equalsIgnoreCase(flatType) ||
+                    p.getType2().equalsIgnoreCase(flatType);
+            return locationMatches && flatTypeMatches;
+        }, (p1, p2) -> p1.getProjectName().compareToIgnoreCase(p2.getProjectName()));
+        
+        // Display the filtered results
+        if (filteredProjects.isEmpty()) {
+            System.out.println("No projects match the given criteria.");
+        } else {
+            System.out.println("Filtered Projects:");
+            for (Project p : filteredProjects) {
+                p.displayDetails(); // Assumes displayDetails() prints project information
+            }
         }
     }
 }
