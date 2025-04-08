@@ -112,7 +112,7 @@ public class ManagerApp {
                 projectName, neighbourhood,
                 type1, type1Units, type1Price,
                 type2, type2Units, type2Price,
-                openingDate.toString(), closingDate.toString(),
+                openingDate.format(DATE_DISPLAY_FORMATTER), closingDate.format(DATE_DISPLAY_FORMATTER),
                 manager.getName(), 10, new ArrayList<>());
 
         projectList.addProject(newProject);
@@ -162,20 +162,25 @@ public class ManagerApp {
                 project.setType2Price(newPrice);
             }
             case 5 -> {
-                LocalDate newOpen = getValidDateInput(scanner, "Current Opening Date: " +
-                        LocalDate.parse(project.getOpeningDate()).format(DATE_DISPLAY_FORMATTER) +
+                LocalDate existingOpen = LocalDate.parse(project.getOpeningDate(), DATE_DISPLAY_FORMATTER);
+                LocalDate existingClose = LocalDate.parse(project.getClosingDate(), DATE_DISPLAY_FORMATTER);
+
+                LocalDate newOpen = getValidDateInput(scanner,
+                        "Current Opening Date: " + existingOpen.format(DATE_DISPLAY_FORMATTER) +
                         "\nEnter new date (yyyy/mm/dd): ");
-                LocalDate newClose = getValidDateInput(scanner, "Current Closing Date: " +
-                        LocalDate.parse(project.getClosingDate()).format(DATE_DISPLAY_FORMATTER) +
+                LocalDate newClose = getValidDateInput(scanner,
+                        "Current Closing Date: " + existingClose.format(DATE_DISPLAY_FORMATTER) +
                         "\nEnter new date (yyyy/mm/dd): ");
 
                 if (newClose.isBefore(newOpen)) {
                     System.out.println("Closing date cannot be before opening date.");
                     return;
                 }
-                project.setOpeningDate(newOpen.toString());
-                project.setClosingDate(newClose.toString());
+
+                project.setOpeningDate(newOpen.format(DATE_DISPLAY_FORMATTER));
+                project.setClosingDate(newClose.format(DATE_DISPLAY_FORMATTER));
             }
+
         }
         System.out.println("Project updated successfully.");
     }
@@ -312,8 +317,8 @@ public class ManagerApp {
         for (Project p : myProjects) {
             System.out.println("\nProject: " + p.getProjectName());
             System.out.println("Status: " + (p.isVisible() ? "Visible" : "Hidden"));
-            System.out.println("Dates: " + LocalDate.parse(p.getOpeningDate()).format(DATE_DISPLAY_FORMATTER) +
-                    " to " + LocalDate.parse(p.getClosingDate()).format(DATE_DISPLAY_FORMATTER));
+            System.out.println("Dates: " + LocalDate.parse(p.getOpeningDate(), DATE_DISPLAY_FORMATTER) +
+                    " to " + LocalDate.parse(p.getClosingDate(), DATE_DISPLAY_FORMATTER));
             System.out.println("Officers: " + p.getOfficers().size() + "/" + p.getOfficerSlot());
         }
     }
