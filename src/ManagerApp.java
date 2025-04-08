@@ -283,19 +283,21 @@ public class ManagerApp {
     }
 
     private static boolean hasOverlappingProjects(Manager manager, ProjectList projectList,
-                                                  LocalDate newOpen, LocalDate newClose) {
-        for (Project p : projectList.getAllProjects()) {
-            if (p.getManagerName().equals(manager.getName())) {
-                LocalDate existingOpen = LocalDate.parse(p.getOpeningDate());
-                LocalDate existingClose = LocalDate.parse(p.getClosingDate());
+            LocalDate newOpen, LocalDate newClose) {
+    	for (Project p : projectList.getAllProjects()) {
+    		if (p.getManagerName().equals(manager.getName())) {
+// Parse the stored date strings using your formatter
+    			LocalDate existingOpen = LocalDate.parse(p.getOpeningDate(), DATE_INPUT_FORMATTER);
+    			LocalDate existingClose = LocalDate.parse(p.getClosingDate(), DATE_INPUT_FORMATTER);
 
-                if (newOpen.isBefore(existingClose) && newClose.isAfter(existingOpen)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    			if (newOpen.isBefore(existingClose) && newClose.isAfter(existingOpen)) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+}
+
 
     protected static void viewMyProjects(Manager manager) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
