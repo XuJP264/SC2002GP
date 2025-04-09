@@ -123,6 +123,7 @@ public class Initialization {
 
                     Manager manager = new Manager(name, age, nric, maritalStatus, password);
                     managerList.addManager(manager);
+                    managerProjectInitiate(manager);
                 }
             }
             System.out.println("Manager list has been initialized");
