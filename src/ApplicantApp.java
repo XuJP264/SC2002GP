@@ -61,32 +61,30 @@ public class ApplicantApp {
     protected static void viewEligibleProjects(Applicant applicant) {
         ProjectList projectList = Initialization.getInstance().getProjectList();
         boolean hasProjects = false;
-
         System.out.println("\n=== Eligible Projects ===");
         for (Project p : projectList.getProjects().values()) {
-            if (p.isVisible() && isEligible(applicant, p)) {
+            if (p.isVisible() && checkEligibility(applicant, p) == 1) {
+                hasProjects = true;
                 displayProjectDetails(p);
-                hasProjects = true;
             }
-            else if (p.isVisible() && applicant.getAge() >= 35 && applicant.getMaritalStatus().equalsIgnoreCase("Single")) {
-                displayProjectDetailsForSingle(p);
+            else if (p.isVisible() && checkEligibility(applicant, p) == 2){
                 hasProjects = true;
+                displayProjectDetailsForSingle(p);
             }
         }
         if (!hasProjects) {
             System.out.println("No eligible visible projects found based on your profile.");
         }
     }
-
-    protected static boolean isEligible(Applicant applicant, Project p) {
-        String status = applicant.getMaritalStatus();
-        int age = applicant.getAge();
-        if (status.equalsIgnoreCase("Married") && age >= 21) {
-            return true;
+    protected static int checkEligibility(Applicant applicant, Project p) {
+        if (applicant.getMaritalStatus().equalsIgnoreCase("Married") && applicant.getAge() >= 21){
+            return 1;
         }
-        return false;
+        else if (applicant.getMaritalStatus().equalsIgnoreCase("Single") && applicant.getAge() >= 35){
+            return 2;
+        }
+        return 0;
     }
-
     protected static void displayProjectDetails(Project p) {
         System.out.println("- " + p.getProjectName() + " (" + p.getNeighborhood() + ")");
         System.out.printf("  Type1: %s (%d units) - $%.2f\n", p.getType1(), p.getType1Units(), p.getType1Price());
@@ -102,56 +100,76 @@ public class ApplicantApp {
     }
 
     protected static void applyForProject(Applicant applicant, Scanner scanner) {
-        ProjectList projectList = Initialization.getInstance().getProjectList();
-        System.out.print("Enter the name of the project you wish to apply for: ");
+        viewEligibleProjects(applicant);
+        System.out.print("Enter project name to apply: ");
         String projectName = scanner.nextLine();
+        ProjectList projectList = Initialization.getInstance().getProjectList();
         Project project = projectList.getProject(projectName);
 
-        if (project == null || !isEligible(applicant, project)) {
-            System.out.println("Invalid or ineligible project.");
+        if (project == null) {
+            System.out.println("Project not found.");
             return;
         }
-        if (Applications.getApplications().containsKey(project) &&
-                Applications.getApplications().get(project).containsKey(applicant)) {
-            if (!"rejected".equals(Applications.getApplications().get(project).get(applicant))) {
-                System.out.println("You have already applied for this project.");
+        if (!project.isVisible()){
+            System.out.println("Project is not visible.");
+            return;
+        }
+        if (checkEligibility(applicant, project)==0) {
+            System.out.println("You are not eligible for this project.");
+            return;
+        }
+        if (applicant.getAppliedProject() != null) {
+            System.out.println("You have already applied for a project.");
+            return;
+        }
+        HashMap<Applicant, String> projectMap = Applications.getApplicationAndStatus(project);
+        if (projectMap != null) {
+            String status = projectMap.get(applicant);
+            if (status != null && !status.contains("Rejected")) {
+                System.out.println("The project has already been applied.");
                 return;
             }
         }
-        if(!(applicant.getMaritalStatus().equalsIgnoreCase("Single") && applicant.getAge() >= 35)||
-                !(applicant.getMaritalStatus().equalsIgnoreCase("Married") && applicant.getAge() >= 21)){
-            System.out.println("You are not allowed to apply for BTO projects.");
+        if (project.getOfficerSlot() <= 0) {
+            System.out.println("There are no available officer slots for this project.");
             return;
         }
-        if(applicant.getMaritalStatus().equalsIgnoreCase("Single") && applicant.getAge() >= 35){
-            System.out.println("You can only apply for 2-Room projects. Choose 1 to continue, 0 to exit.");
-            int choice = ValidChoice.getValidChoice(scanner, 0, 1);
-            if (choice == 0) {
-                return;
-            }
-            if (choice == 1) {
-                Applications.addApplication(project, applicant, "Pending"+" 2-Room");
-                applicant.setAppliedProject(project);
-                applicant.setFlatType("2-Room");
-                System.out.println("You have successfully applied for: " + projectName + " 2-Room");
-            }
+        if (project.getOfficers().contains(applicant.getName())) {
+            System.out.println("You are already an officer for this project.");
+            return;
         }
-        if(applicant.getMaritalStatus().equalsIgnoreCase("Married") && applicant.getAge() >= 21){
-            System.out.println("You can apply for 2-Room or 3-Room projects.  Choose 1 to 2-Room, 2 to 3-Room, 0 to exit.");
+        if (checkEligibility(applicant, project) == 1) {
+            System.out.println("You are eligible for this project.");
+            System.out.println("Choose 1 for 2-room flat or 2 for 3-room flat, 0 to cancel.");
             int choice = ValidChoice.getValidChoice(scanner, 0, 2);
-            if (choice == 0) {
-                return;
-            }
             if (choice == 1) {
-                Applications.addApplication(project, applicant, "Pending"+" 2-Room");
-                applicant.setAppliedProject(project);
+                Applications.addApplication(project, applicant, "Pending 2-Room");
                 applicant.setFlatType("2-Room");
-                System.out.println("You have successfully applied for: " + projectName + " 2-Room");
             }
             else if (choice == 2) {
-                Applications.addApplication(project, applicant, "Pending"+" 3-Room");
-                applicant.setAppliedProject(project);
+                Applications.addApplication(project, applicant, "Pending 3-Room");
                 applicant.setFlatType("3-Room");
+            }
+            else if (choice == 0) {
+                System.out.println("Goodbye!");
+                return;
+            }
+            applicant.setAppliedProject(project);
+            System.out.println("You have successfully applied for this project.");
+        }
+        else if (checkEligibility(applicant, project) == 2) {
+            System.out.println("You are eligible for this project.");
+            System.out.println("Choose 1 for 2-room flat. 0 to cancel.");
+            int choice = ValidChoice.getValidChoice(scanner, 0, 1);
+            if (choice == 1) {
+                Applications.addApplication(project, applicant, "Pending 2-Room");
+                applicant.setFlatType("2-Room");
+                applicant.setAppliedProject(project);
+                System.out.println("You have successfully applied for this project.");
+            }
+            else if (choice == 0) {
+                System.out.println("Goodbye!");
+                return;
             }
         }
     }
