@@ -68,8 +68,11 @@ public class ApplicantApp {
                 displayProjectDetails(p);
                 hasProjects = true;
             }
+            else if (p.isVisible() && applicant.getAge() >= 35 && applicant.getMaritalStatus().equalsIgnoreCase("Single")) {
+                displayProjectDetailsForSingle(p);
+                hasProjects = true;
+            }
         }
-
         if (!hasProjects) {
             System.out.println("No eligible visible projects found based on your profile.");
         }
@@ -78,9 +81,6 @@ public class ApplicantApp {
     protected static boolean isEligible(Applicant applicant, Project p) {
         String status = applicant.getMaritalStatus();
         int age = applicant.getAge();
-        if (status.equalsIgnoreCase("Single") && age >= 35) {
-            return p.getType1().equalsIgnoreCase("2-Room") || p.getType2().equalsIgnoreCase("2-Room");
-        }
         if (status.equalsIgnoreCase("Married") && age >= 21) {
             return true;
         }
@@ -91,6 +91,12 @@ public class ApplicantApp {
         System.out.println("- " + p.getProjectName() + " (" + p.getNeighborhood() + ")");
         System.out.printf("  Type1: %s (%d units) - $%.2f\n", p.getType1(), p.getType1Units(), p.getType1Price());
         System.out.printf("  Type2: %s (%d units) - $%.2f\n", p.getType2(), p.getType2Units(), p.getType2Price());
+        System.out.println("  Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
+        System.out.println("  Manager: " + p.getManagerName());
+    }
+    protected static void displayProjectDetailsForSingle(Project p) {
+        System.out.println("- " + p.getProjectName() + " (" + p.getNeighborhood() + ")");
+        System.out.printf("  Type1: %s (%d units) - $%.2f\n", p.getType1(), p.getType1Units(), p.getType1Price());
         System.out.println("  Dates: " + p.getOpeningDate() + " to " + p.getClosingDate());
         System.out.println("  Manager: " + p.getManagerName());
     }
