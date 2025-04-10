@@ -11,19 +11,24 @@ public class ManagerApp {
 
     public static void main(Manager manager) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome to HDB Manager Portal");
-        System.out.println("Logged in as: " + manager.getName());
+        System.out.println("Welcome to the HDB Applicant Portal");
+        System.out.println("Logged in as: " + manager.getName() + " (" + manager.getNRIC() + ")");
 
-        while (true) {
-            displayMainMenu();
-            int choice = ValidChoice.getValidChoice(scanner, 0, 14);
+        try {
+            while (true) {
+                displayMainMenu();
+                int choice = ValidChoice.getValidChoice(scanner, 0, 14);
 
-            if (choice == 0) {
-                System.out.println("Logging out... Goodbye!");
-                return;
+                if (choice == 0) {
+                    System.out.println("Logging out... Goodbye!");
+                    return;
+                }
+
+                processChoice(manager, scanner, choice);
             }
-
-            processUserChoice(manager, scanner, choice);
+        } catch (ForceLogoutException e) {
+            System.out.println(e.getMessage());
+            return; // 退出 main 方法
         }
     }
 
@@ -46,7 +51,7 @@ public class ManagerApp {
         System.out.println("0. Logout");
     }
 
-    protected static void processUserChoice(Manager manager, Scanner scanner, int choice) {
+    protected static void processChoice(Manager manager, Scanner scanner, int choice) {
         switch (choice) {
             case 1 -> createNewBTOProject(manager, scanner);
             case 2 -> editBTOProject(manager, scanner);
@@ -60,7 +65,7 @@ public class ManagerApp {
             case 10 -> processWithdrawalRequest(manager, scanner);
             case 11 -> generateApplicantsReport(manager, scanner);
             case 12 -> viewAndReplyEnquiries(scanner, manager);
-            case 13 -> modifyManagerPassword(manager, scanner);
+            case 13 -> modifyPassword(manager, scanner);
             case 14 -> viewProjectsByFilter(manager, scanner);
         }
     }
@@ -541,7 +546,7 @@ public class ManagerApp {
         }
     }
 
-    protected static void modifyManagerPassword(Manager manager, Scanner scanner) {
+    protected static void modifyPassword(Manager manager, Scanner scanner) {
         System.out.print("\nEnter new password: ");
         String newPassword = scanner.nextLine();
         System.out.print("Confirm new password: ");
@@ -549,7 +554,8 @@ public class ManagerApp {
 
         if (newPassword.equals(confirmPassword)) {
             manager.setPassword(newPassword);
-            System.out.println("Password updated successfully!");
+            System.out.println("Password updated successfully! Please login again.");
+            throw new ForceLogoutException(); // 抛出异常
         } else {
             System.out.println("Passwords do not match. Password not changed.");
         }

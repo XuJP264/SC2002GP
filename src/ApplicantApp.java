@@ -10,16 +10,21 @@ public class ApplicantApp {
         System.out.println("Welcome to the HDB Applicant Portal");
         System.out.println("Logged in as: " + applicant.getName() + " (" + applicant.getNRIC() + ")");
 
-        while (true) {
-            displayMainMenu();
-            int choice = ValidChoice.getValidChoice(scanner, 0, 10);
+        try {
+            while (true) {
+                displayMainMenu();
+                int choice = ValidChoice.getValidChoice(scanner, 0, 10);
 
-            if (choice == 0) {
-                System.out.println("Logging out... Goodbye!");
-                return;
+                if (choice == 0) {
+                    System.out.println("Logging out... Goodbye!");
+                    return;
+                }
+
+                processChoice(applicant, scanner, choice);
             }
-
-            processChoice(applicant, scanner, choice);
+        } catch (ForceLogoutException e) {
+            System.out.println(e.getMessage());
+            return; // 退出 main 方法
         }
     }
 
@@ -319,9 +324,15 @@ public class ApplicantApp {
 
         if (newPassword.equals(confirmPassword)) {
             applicant.setPassword(newPassword);
-            System.out.println("Password updated successfully!");
+            System.out.println("Password updated successfully! Please login again.");
+            throw new ForceLogoutException(); // 抛出异常
         } else {
             System.out.println("Passwords do not match. Password not changed.");
         }
+    }
+}
+class ForceLogoutException extends RuntimeException {
+    public ForceLogoutException() {
+        super("Password changed. Please login again.");
     }
 }

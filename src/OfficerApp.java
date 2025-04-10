@@ -9,21 +9,26 @@ import java.util.Map;
 public class OfficerApp extends ApplicantApp{
     public static void main(Officer officer) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome to HDB Officer Portal");
+        System.out.println("Welcome to the HDB Applicant Portal");
         System.out.println("Logged in as: " + officer.getName() + " (" + officer.getNRIC() + ")");
-        while (true) {
-            displayMainMenu();
-            int choice = ValidChoice.getValidChoice(scanner, 0, 16);
 
-            if (choice == 0) {
-                System.out.println("Logging out... Goodbye!");
-                return;
+        try {
+            while (true) {
+                displayMainMenu();
+                int choice = ValidChoice.getValidChoice(scanner, 0, 10);
+
+                if (choice == 0) {
+                    System.out.println("Logging out... Goodbye!");
+                    return;
+                }
+
+                processChoice(officer, scanner, choice);
             }
-
-            processUserChoice(officer, scanner, choice);
+        } catch (ForceLogoutException e) {
+            System.out.println(e.getMessage());
+            return; // 退出 main 方法
         }
     }
-
     private static void officerInitiate(Officer officer) {
         Initialization initialization = Initialization.getInstance();
         ProjectList projectList = initialization.getProjectList();
@@ -60,7 +65,7 @@ public class OfficerApp extends ApplicantApp{
         System.out.println("0. Logout");
     }
 
-    protected static void processUserChoice(Officer officer, Scanner scanner, int choice) {
+    protected static void processChoice(Officer officer, Scanner scanner, int choice) {
         switch (choice) {
             case 1 -> viewEligibleProjects(officer);
             case 2 -> applyForProject(officer, scanner);
@@ -232,17 +237,18 @@ public class OfficerApp extends ApplicantApp{
             }
         }
     }
-        protected static void modifyPassword(Officer officer, Scanner scanner) {
-            System.out.print("\nEnter new password: ");
-            String newPassword = scanner.nextLine();
-            System.out.print("Confirm new password: ");
-            String confirmPassword = scanner.nextLine();
+    protected static void modifyPassword(Officer officer, Scanner scanner) {
+        System.out.print("\nEnter new password: ");
+        String newPassword = scanner.nextLine();
+        System.out.print("Confirm new password: ");
+        String confirmPassword = scanner.nextLine();
 
-            if (newPassword.equals(confirmPassword)) {
-                officer.setPassword(newPassword);
-                System.out.println("Password updated successfully!");
-            } else {
-                System.out.println("Passwords do not match. Password not changed.");
-            }
+        if (newPassword.equals(confirmPassword)) {
+            officer.setPassword(newPassword);
+            System.out.println("Password updated successfully! Please login again.");
+            throw new ForceLogoutException(); // 抛出异常
+        } else {
+            System.out.println("Passwords do not match. Password not changed.");
         }
+    }
 }
