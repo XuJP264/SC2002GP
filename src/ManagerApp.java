@@ -384,6 +384,7 @@ public class ManagerApp {
                             RegistrationList.addRegistrationCondition(officer, p, "Approved");
                             if (!p.getOfficers().contains(officer.getName())) {
                                 p.addOfficer(officer.getName());
+                                officer.addProjectInCharge(p.getProjectName());
                             }
                             System.out.println("Officer " + officer.getName() + " approved for project " + p.getProjectName());
                         } else {
