@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Map;
 public class OfficerApp extends ApplicantApp{
     public static void main(Officer officer) {
+        System.out.println(officer.getProjectsInCharge().isEmpty());
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the HDB Applicant Portal");
         System.out.println("Logged in as: " + officer.getName() + " (" + officer.getNRIC() + ")");
@@ -15,7 +16,7 @@ public class OfficerApp extends ApplicantApp{
         try {
             while (true) {
                 displayMainMenu();
-                int choice = ValidChoice.getValidChoice(scanner, 0, 10);
+                int choice = ValidChoice.getValidChoice(scanner, 0, 16);
 
                 if (choice == 0) {
                     System.out.println("Logging out... Goodbye!");
@@ -213,11 +214,8 @@ public class OfficerApp extends ApplicantApp{
         ApplicantList applicants = Initialization.getInstance().getApplicantList();
         for (Applicant applicant : applicants.getAllApplicants()){
             for(Project project : officer.getProjectsInCharge()){
-                if (Enquiry.getEnquiryByApplicant(applicant)!= null){
-                    System.out.println("Applicant: " + applicant.getName());
-                    System.out.println("Project: " + project.getProjectName());
-                    System.out.println("Inquiries: ");
-                    List<String> inquiries = Enquiry.getEnquiryByProject(applicant,project);
+                List<String> inquiries = Enquiry.getEnquiryByProject(applicant, project);
+                if (inquiries != null && !inquiries.isEmpty()) {
                     for(int i = 0; i < inquiries.size(); i++){
                         System.out.println(i+1 + ". " + inquiries.get(i));
                     }

@@ -47,6 +47,12 @@ public class Enquiry {
         return applicantEnquiry.get(applicant);
     }
     public static ArrayList<String> getEnquiryByProject(Applicant applicant, Project project) {
-        return applicantEnquiry.get(applicant).get(project);
+        // 检查 applicantEnquiry 是否包含 applicant，并且该 applicant 是否包含 project
+        if (applicantEnquiry.containsKey(applicant) && applicantEnquiry.get(applicant).containsKey(project)) {
+            return applicantEnquiry.get(applicant).get(project);
+        }
+        // 如果查询不到返回一个空的 List
+        return new ArrayList<>();
     }
+
 }
