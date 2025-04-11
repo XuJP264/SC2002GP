@@ -73,7 +73,7 @@ public class ApplicantApp {
             }
         }
         if (!hasProjects) {
-            System.out.println("No eligible visible projects found based on your profile.");
+            System.out.println("No eligible visible projects found based on your profile. ");
         }
     }
     protected static int checkEligibility(Applicant applicant, Project p) {
