@@ -123,13 +123,6 @@ public class ApplicantApp {
             return;
         }
         HashMap<Applicant, String> projectMap = Applications.getApplicationAndStatus(project);
-        if (projectMap != null) {
-            String status = projectMap.get(applicant);
-            if (status != null && !status.contains("Rejected")) {
-                System.out.println("The project has already been applied.");
-                return;
-            }
-        }
         if (project.getOfficerSlot() <= 0) {
             System.out.println("There are no available officer slots for this project.");
             return;

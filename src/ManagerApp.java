@@ -408,50 +408,36 @@ public class ManagerApp {
             System.out.println("You don't have any projects with applications.");
             return;
         }
-        for (Project p : manager.getMyProject()) {
-            System.out.println("\nProject: " + p.getProjectName());
-            HashMap<Applicant, String> applicationAndStatus = Applications.getApplicationAndStatus(p);
-            if (applicationAndStatus != null && !applicationAndStatus.isEmpty()){
-                for (Applicant a : applicationAndStatus.keySet()){
-                    String status = applicationAndStatus.get(a);
-                    if (status.equalsIgnoreCase("Pending")){
-                        // Assume applicant a has a flatType field indicating "2-Room" or "3-Room"
-                        System.out.println("Applicant: " + a.getName() + " applied for flat type: " + a.getFlatType());
-                        System.out.println("Current status: " + status);
-                        System.out.println("Enter 1 to Approve or 2 to Reject this application:");
-                        int choice = ValidChoice.getValidChoice(scanner, 1, 2);
+        boolean  foundPending = false;
+        for (Project p : manager.getMyProject()){
+            HashMap<Applicant, String> applications = Applications.getApplicationAndStatus(p);
+            if (applications != null && !applications.isEmpty()) {
+                System.out.println("\nProject: " + p.getProjectName());
+                System.out.println("Applicants: ");
+                for(Applicant a : applications.keySet()){
+                    if(applications.get(a).contains("Pending")){
+                        foundPending = true;
+                        String condition = applications.get(a);
+                        System.out.println(a.getName() + " (" + a.getNRIC() + ")");
+                        System.out.println("Enter 1 to Accept or 2 to Reject this application, 0 to pass this application.");
+                        int choice = ValidChoice.getValidChoice(scanner, 0, 2);
                         if (choice == 1) {
-                            String flatType = a.getFlatType();
-                            if (flatType.equalsIgnoreCase("2-Room")) {
-                                if (p.getType1Units() > 0) {
-                                    p.setType1Units(p.getType1Units() - 1);
-                                    Applications.updateApplicationStatus(p, a, "Successful - 2-Room booked");
-                                    System.out.println("Application approved. 2-Room booked for " + a.getName());
-                                } else {
-                                    Applications.updateApplicationStatus(p, a, "Rejected - No 2-Room units available");
-                                    System.out.println("No 2-Room units available. Application rejected.");
-                                }
-                            } else if (flatType.equalsIgnoreCase("3-Room")) {
-                                if (p.getType2Units() > 0) {
-                                    p.setType2Units(p.getType2Units() - 1);
-                                    Applications.updateApplicationStatus(p, a, "Successful - 3-Room booked");
-                                    System.out.println("Application approved. 3-Room booked for " + a.getName());
-                                } else {
-                                    Applications.updateApplicationStatus(p, a, "Rejected - No 3-Room units available");
-                                    System.out.println("No 3-Room units available. Application rejected.");
-                                }
-                            } else {
-                                System.out.println("Unknown flat type for applicant " + a.getName() + ". Skipping.");
-                            }
-                        } else {
-                            Applications.updateApplicationStatus(p, a, "Unsuccessful");
-                            System.out.println("Application rejected for " + a.getName());
+                            Applications.updateApplicationStatus(p, a, "Successful "+a.getFlatType());
+                            System.out.println("Application accepted for " + a.getName() + " for project " + p.getProjectName());
+                        }
+                        else if (choice == 2) {
+                            Applications.updateApplicationStatus(p, a, "Rejected " + a.getFlatType());
+                            System.out.println("Application rejected for " + a.getName() + " for project " + p.getProjectName());
+                        }
+                        else if (choice == 0) {
+                            continue;
                         }
                     }
                 }
-            } else {
-                System.out.println("No pending applications for project " + p.getProjectName());
             }
+        }
+        if (!foundPending) {
+            System.out.println("No pending applications found for your projects.");
         }
     }
 
