@@ -321,7 +321,7 @@ public class ApplicantApp {
             }
             else if (applicant.getFlatType().equalsIgnoreCase("3-Room")) {
                 System.out.println("Your flat type is 3-Room.");
-                System.out.println("Choose a flat number from 1 to " + applicant.getAppliedProject().getType2Units()) + " to continue.");
+                System.out.println("Choose a flat number from 1 to " + applicant.getAppliedProject().getType2Units() + " to continue.");
                 int choice = ValidChoice.getValidChoice(scanner, 1,  applicant.getAppliedProject().getType2Units());
                 Booking.addBooking(applicant.getAppliedProject(),applicant, "3-Room");
             }
