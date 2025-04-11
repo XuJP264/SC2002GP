@@ -17,7 +17,7 @@ public class ManagerApp {
         try {
             while (true) {
                 displayMainMenu();
-                int choice = ValidChoice.getValidChoice(scanner, 0, 14);
+                int choice = ValidChoice.getValidChoice(scanner, 0, 15);
 
                 if (choice == 0) {
                     System.out.println("Logging out... Goodbye!");
@@ -48,6 +48,7 @@ public class ManagerApp {
         System.out.println("12. View and reply to enquiries");
         System.out.println("13. Modify password");
         System.out.println("14. View projects by filter");
+        System.out.println("15. Manage Log");
         System.out.println("0. Logout");
     }
 
@@ -67,6 +68,7 @@ public class ManagerApp {
             case 12 -> viewAndReplyEnquiries(scanner, manager);
             case 13 -> modifyPassword(manager, scanner);
             case 14 -> viewProjectsByFilter(manager, scanner);
+            case 15 -> dailyLogMenu(manager,scanner);
         }
     }
     protected static void createNewBTOProject(Manager manager, Scanner scanner) {
@@ -417,7 +419,6 @@ public class ManagerApp {
                 for(Applicant a : applications.keySet()){
                     if(applications.get(a).contains("Pending")){
                         foundPending = true;
-                        String condition = applications.get(a);
                         System.out.println(a.getName() + " (" + a.getNRIC() + ")");
                         System.out.println("Enter 1 to Accept or 2 to Reject this application, 0 to pass this application.");
                         int choice = ValidChoice.getValidChoice(scanner, 0, 2);
@@ -580,4 +581,60 @@ public class ManagerApp {
             }
         }
     }
+    private static void dailyLogMenu(Manager manager, Scanner scanner) {
+        while (true) {
+            System.out.println("\n=== DAILY LOG MENU ===");
+            System.out.println("1. Add today's log entry");
+            System.out.println("2. View today's log");
+            System.out.println("3. View a specific date's log");
+            System.out.println("0. Return to Manager Main Menu");
+
+            int choice = ValidChoice.getValidChoice(scanner, 0, 3);
+            switch (choice) {
+                case 1 -> {
+                    System.out.print("Enter your log entry: ");
+                    String entry = scanner.nextLine().trim();
+                    if (!entry.isEmpty()) {
+                        DailyLogManager.addLogEntry(manager, entry);
+                        System.out.println("Log entry added for today.");
+                    } else {
+                        System.out.println("Entry cannot be empty.");
+                    }
+                }
+                case 2 -> {
+                    var logs = DailyLogManager.getLogEntries(manager, java.time.LocalDate.now());
+                    if (logs.isEmpty()) {
+                        System.out.println("No logs found for today.");
+                    } else {
+                        System.out.println("=== Today's Logs ===");
+                        for (String e : logs) {
+                            System.out.println("- " + e);
+                        }
+                    }
+                }
+                case 3 -> {
+                    System.out.print("Enter date (yyyy-MM-dd or yyyy/MM/dd): ");
+                    String dateInput = scanner.nextLine().trim().replace("/", "-");
+                    try {
+                        java.time.LocalDate date = java.time.LocalDate.parse(dateInput);
+                        var logs = DailyLogManager.getLogEntries(manager, date);
+                        if (logs.isEmpty()) {
+                            System.out.println("No logs found for " + date + ".");
+                        } else {
+                            System.out.println("=== Logs for " + date + " ===");
+                            for (String e : logs) {
+                                System.out.println("- " + e);
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Invalid date format. Please use yyyy-MM-dd.");
+                    }
+                }
+                case 0 -> {
+                    return;  // Return to Manager's main menu
+                }
+            }
+        }
+    }
+
 }
