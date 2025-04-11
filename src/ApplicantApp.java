@@ -8,7 +8,7 @@ public class ApplicantApp {
     public static void main(Applicant applicant) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the HDB Applicant Portal");
-        System.out.println("Logged in as: " + applicant.getName() + " (" + applicant.getNRIC() + ")");
+        System.out.println("Logged in as: " + applicant.getName() + " (" + applicant.getNRIC() + ") ");
 
         try {
             while (true) {
