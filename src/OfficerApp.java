@@ -177,6 +177,8 @@ public class OfficerApp extends ApplicantApp{
                        else if (Booking.getBookingType(project, applicant).equals("3-Room")){
                            project.setType2Units(project.getType2Units() - 1);
                        }
+                       Booking.removeBooking(project, applicant);
+                       applicant
                        System.out.println("Booking removed and application status updated");
                    }
                }

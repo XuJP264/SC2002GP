@@ -124,8 +124,11 @@ public class ApplicantApp {
             return;
         }
         if (applicant.getAppliedProject() != null) {
+            if (Applications.getApplicationAndStatus(applicant.getAppliedProject())!=null
+                    && !Applications.getApplications().get(applicant.getAppliedProject()).get(applicant).contains("Rejected")){
             System.out.println("You have already applied for a project.");
             return;
+            }
         }
         HashMap<Applicant, String> projectMap = Applications.getApplicationAndStatus(project);
         if (project.getOfficerSlot() <= 0) {
