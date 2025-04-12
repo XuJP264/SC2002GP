@@ -164,6 +164,7 @@ public class OfficerApp extends ApplicantApp{
        for(Project project : officer.getProjectsInCharge()){
            if(Booking.getBookings(project)!= null){
                for(Applicant applicant : Booking.getBookings(project).keySet()) {
+                   if (!Booking.getBookingType(project, applicant).contains("Done")){
                    System.out.println("Project: " + project.getProjectName());
                    System.out.println("Applicant: " + applicant.getName());
                    System.out.println("Booking Type: " + Booking.getBookingType(project, applicant));
@@ -172,13 +173,15 @@ public class OfficerApp extends ApplicantApp{
                    if (choice == 1) {
                        Applications.updateApplicationStatus(project, applicant, "Booked");
                        if (Booking.getBookingType(project, applicant).equals("2-Room")) {
+                           Booking.addBooking(project, applicant, "Done 2-Room");
                            project.setType1Units(project.getType1Units() - 1);
                        }
                        else if (Booking.getBookingType(project, applicant).equals("3-Room")){
+                           Booking.addBooking(project, applicant, "Done 3-Room");
                            project.setType2Units(project.getType2Units() - 1);
                        }
-                       Booking.removeBooking(project, applicant);
                        System.out.println("Booking removed and application status updated");
+                   }
                    }
                }
            }

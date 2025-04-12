@@ -131,10 +131,6 @@ public class ApplicantApp {
             }
         }
         HashMap<Applicant, String> projectMap = Applications.getApplicationAndStatus(project);
-        if (project.getOfficerSlot() <= 0) {
-            System.out.println("There are no available officer slots for this project.");
-            return;
-        }
         if (project.getOfficers().contains(applicant.getName())) {
             System.out.println("You are already an officer for this project.");
             return;
@@ -144,10 +140,18 @@ public class ApplicantApp {
             System.out.println("Choose 1 for 2-room flat or 2 for 3-room flat, 0 to cancel.");
             int choice = ValidChoice.getValidChoice(scanner, 0, 2);
             if (choice == 1) {
+                if (project.getType1Units() <= 0) {
+                    System.out.println("No units available for 2-room flat.");
+                    return;
+                }
                 Applications.addApplication(project, applicant, "Pending 2-Room");
                 applicant.setFlatType("2-Room");
             }
             else if (choice == 2) {
+                if (project.getType2Units() <= 0) {
+                    System.out.println("No units available for 3-room flat.");
+                    return;
+                }
                 Applications.addApplication(project, applicant, "Pending 3-Room");
                 applicant.setFlatType("3-Room");
             }
@@ -163,6 +167,10 @@ public class ApplicantApp {
             System.out.println("Choose 1 for 2-room flat. 0 to cancel.");
             int choice = ValidChoice.getValidChoice(scanner, 0, 1);
             if (choice == 1) {
+                if (project.getType1Units() <= 0) {
+                    System.out.println("No units available for 2-room flat.");
+                    return;
+                }
                 Applications.addApplication(project, applicant, "Pending 2-Room");
                 applicant.setFlatType("2-Room");
                 applicant.setAppliedProject(project);
