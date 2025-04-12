@@ -26,7 +26,6 @@ class Officer extends Applicant implements ProjectInCharge {
     public void addProjectInCharge(Project project) {
         projectsInCharge.add(project);
     }
-
     @Override
     public void removeProjectInCharge(Project project) {
         projectsInCharge.remove(project);

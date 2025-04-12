@@ -5,7 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ApplicantApp {
+    private static ValidPassword validPassword;
+    public static void setValidPassword(ValidPassword validator) {
+        validPassword = validator;
+    }
     public static void main(Applicant applicant) {
+        setValidPassword(new PasswordChecker());
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to the HDB Applicant Portal");
         System.out.println("Logged in as: " + applicant.getName() + " (" + applicant.getNRIC() + ") ");
@@ -337,14 +342,21 @@ public class ApplicantApp {
         System.out.print("Confirm new password: ");
         String confirmPassword = scanner.nextLine();
 
-        if (newPassword.equals(confirmPassword)) {
-            applicant.setPassword(newPassword);
-            System.out.println("Password updated successfully! Please login again.");
-            throw new ForceLogoutException(); // 抛出异常
-        } else {
+        if (!newPassword.equals(confirmPassword)) {
             System.out.println("Passwords do not match. Password not changed.");
+            return;
         }
+
+        if (!validPassword.isValid(newPassword)) {
+            System.out.println("Password does not meet requirements. Password not changed.");
+            return;
+        }
+
+        applicant.setPassword(newPassword);
+        System.out.println("Password updated successfully! Please login again.");
+        throw new ForceLogoutException(); // 抛出异常
     }
+
 }
 class ForceLogoutException extends RuntimeException {
     public ForceLogoutException() {
