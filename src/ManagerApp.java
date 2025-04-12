@@ -455,7 +455,7 @@ public class ManagerApp {
                     WithdrawApplication.removeWithdrawal(p);
                     Applications.updateApplicationStatus(p, withdrawalApplicant, "Withdrawn");
                     Applications.removeApplication(p, withdrawalApplicant);
-                    withdrawalApplicant.getAppliedProject()=null;
+                    withdrawalApplicant.setAppliedProject(null);
                     System.out.println("Application withdrawn successfully.");
                 } else if (choice.equalsIgnoreCase("n")) {
                     System.out.println("Withdrawal request not processed.");

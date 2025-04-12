@@ -178,7 +178,6 @@ public class OfficerApp extends ApplicantApp{
                            project.setType2Units(project.getType2Units() - 1);
                        }
                        Booking.removeBooking(project, applicant);
-                       applicant
                        System.out.println("Booking removed and application status updated");
                    }
                }
