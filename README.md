@@ -44,10 +44,10 @@ If you have nested packages or directories, adjust the compile commands accordin
 Place your initial CSV data files (e.g., ApplicantList.csv, ManagerList.csv, OfficerList.csv, ProjectList.csv) inside a folder named data in the project root. The Initialization class will read these files at startup.
 
 3. Run the Application:
-Run the main entry point using:
-```
-java Main
-```
+  Run the main entry point using:
+  ```
+  java Main
+  ```
 4. Interacting with the System:
 Use the CLI menus provided in the application to log in as an Applicant, Officer, or Manager and test the various functionalities.
 
