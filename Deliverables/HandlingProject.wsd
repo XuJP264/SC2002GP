@@ -1,0 +1,24 @@
+@startuml
+title Officer Registering to Handle a Project
+
+actor Officer as officer
+boundary OfficerApp as officerApp
+control ProjectList as projectList
+entity Project as project
+control RegistrationList as registrationList
+
+officer -> officerApp: registerForProject(projectName)
+
+officerApp -> projectList: getProject(projectName)
+projectList --> officerApp: Project or null
+
+alt project found
+    'Check for overlapping dates, availability, etc. (omitted for brevity)
+    officerApp -> registrationList: addRegistration(officer, project)
+    registrationList --> officerApp: "Pending" status recorded
+    
+    officer <-- officerApp: "Registration request sent to Manager"
+else project not found
+    officer <-- officerApp: "Invalid project name"
+end
+@enduml
