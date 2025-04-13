@@ -39,7 +39,7 @@
    javac *.java
    ```
 
-If you have nested packages or directories, adjust the compile commands accordingly.
+   If you have nested packages or directories, adjust the compile commands accordingly.
 
 2. Prepare Data Files:
 Place your initial CSV data files (e.g., ApplicantList.csv, ManagerList.csv, OfficerList.csv, ProjectList.csv) inside a folder named data in the project root. The Initialization class will read these files at startup.
