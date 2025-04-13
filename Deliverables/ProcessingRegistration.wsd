@@ -1,0 +1,36 @@
+@startuml
+title Manager Processing Officer Registration
+
+actor Manager as manager
+boundary ManagerApp as managerApp
+control RegistrationList as registrationList
+entity Project as project
+entity Officer as officer
+
+manager -> managerApp: processOfficerRegistration()
+note right: Manager chooses the\n"Process officer registrations" menu
+
+managerApp -> registrationList: getRegistrationList()
+registrationList --> managerApp: Map<Officer, ArrayList<Project>>
+
+loop For each project the manager owns
+    managerApp -> registrationList: getRegistrationCondition(officer, project)
+    alt condition == "Pending"
+        managerApp -> manager: "Approve or Reject?"
+        alt approved
+            managerApp -> registrationList: addRegistrationCondition(officer, project, "Approved")
+            managerApp -> project: addOfficer(officer.getName())
+            managerApp -> officer: addProjectInCharge(project)
+            manager <-- managerApp: "Officer Approved"
+        else rejected
+            managerApp -> registrationList: addRegistrationCondition(officer, project, "Rejected")
+            managerApp -> registrationList: removeRegistration(officer, project)
+            manager <-- managerApp: "Officer Rejected"
+        end
+    else condition != "Pending"
+        managerApp -> manager: "No Pending Registration for this (officer, project)"
+    end
+end
+
+manager <-- managerApp: "Done Processing"
+@enduml
