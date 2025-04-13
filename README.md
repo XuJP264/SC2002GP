@@ -38,6 +38,7 @@
    ```
    javac *.java
    ```
+
 If you have nested packages or directories, adjust the compile commands accordingly.
 
 2. Prepare Data Files:
@@ -45,9 +46,9 @@ Place your initial CSV data files (e.g., ApplicantList.csv, ManagerList.csv, Off
 
 3. Run the Application:
   Run the main entry point using:
-  ```
-  java Main
-  ```
+    ```
+    java Main
+    ```
 4. Interacting with the System:
 Use the CLI menus provided in the application to log in as an Applicant, Officer, or Manager and test the various functionalities.
 
