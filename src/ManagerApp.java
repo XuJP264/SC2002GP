@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -559,26 +561,42 @@ public class ManagerApp {
         System.out.print("Enter flat type filter (e.g., 2-Room or 3-Room, or press Enter to show all): ");
         String flatType = scanner.nextLine().trim();
         
-        // Retrieve all projects from the global ProjectList
+        //Extra implementation of fuzzy search
+        System.out.print("Enter fuzzy search term for project name: ");
+        String fuzzyQuery = scanner.nextLine().trim();
+        
+        //Retrieve all projects from the global ProjectList
         ProjectList projectList = Initialization.getInstance().getProjectList();
         List<Project> allProjects = projectList.getAllProjects();
         
-        // Use ViewBy.filterAndSort to filter and sort projects alphabetically by project name
-        List<Project> filteredProjects = ViewBy.filterAndSort(allProjects, p -> {
-            boolean locationMatches = location.isEmpty() || p.getNeighborhood().equalsIgnoreCase(location);
-            boolean flatTypeMatches = flatType.isEmpty() ||
-                    p.getType1().equalsIgnoreCase(flatType) ||
-                    p.getType2().equalsIgnoreCase(flatType);
-            return locationMatches && flatTypeMatches;
-        }, (p1, p2) -> p1.getProjectName().compareToIgnoreCase(p2.getProjectName()));
+        List<Project> filteredProjects = allProjects.stream()
+                .filter(p -> {
+                    boolean locationMatches = location.isEmpty() || p.getNeighborhood().equalsIgnoreCase(location);
+                    boolean flatTypeMatches = flatType.isEmpty() ||
+                        p.getType1().equalsIgnoreCase(flatType) ||
+                        p.getType2().equalsIgnoreCase(flatType);
+                    return locationMatches && flatTypeMatches;
+                })
+                .collect(Collectors.toList());
         
-        // Display the filtered results
+        if (!fuzzyQuery.isEmpty()) {
+        	filteredProjects = ViewBy.fuzzyFilter(
+                    filteredProjects,
+                    p -> p.getProjectName() + " " + p.getNeighborhood(), // Combine fields for better matching.
+                    fuzzyQuery
+                );
+            }
+        
+        // Sort the resulting projects alphabetically by project name.
+        filteredProjects.sort(Comparator.comparing(Project::getProjectName, String.CASE_INSENSITIVE_ORDER));
+        
+        // Display the results.
         if (filteredProjects.isEmpty()) {
             System.out.println("No projects match the given criteria.");
         } else {
             System.out.println("Filtered Projects:");
             for (Project p : filteredProjects) {
-                p.displayDetails(); // Assumes displayDetails() prints project information
+                p.displayDetails();
             }
         }
     }
